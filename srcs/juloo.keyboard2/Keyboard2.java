@@ -445,7 +445,6 @@ public class Keyboard2 extends InputMethodService
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return true;
           case MotionEvent.ACTION_MOVE:
-            WindowManager wm = getWindow().getWindow().getWindowManager();
             WindowManager.LayoutParams lp2 = getWindow().getWindow().getAttributes();
             int dx = (int)(event.getRawX() - _dragStartX);
             int dy = (int)(event.getRawY() - _dragStartY);
@@ -454,7 +453,7 @@ public class Keyboard2 extends InputMethodService
             android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
             lp2.x = Math.max(0, Math.min(_windowStartX + dx, dm.widthPixels - winW));
             lp2.y = Math.max(0, Math.min(_windowStartY + dy, dm.heightPixels - winH));
-            wm.updateViewLayout(getWindow().getWindow().getDecorView(), lp2);
+            getWindow().getWindow().setAttributes(lp2);
             return true;
           case MotionEvent.ACTION_UP:
           case MotionEvent.ACTION_CANCEL:
@@ -531,6 +530,10 @@ public class Keyboard2 extends InputMethodService
   @Override
   public void onSharedPreferenceChanged(SharedPreferences _prefs, String _key)
   {
+    // Saving the floating window position must not rebuild the keyboard,
+    // otherwise it flickers and jumps after each drag.
+    if (PREF_FLOATING_X.equals(_key) || PREF_FLOATING_Y.equals(_key))
+      return;
     refresh_config();
     _keyboard_layout_view.setKeyboard(current_layout());
     updateSoftInputWindowLayoutParams();

@@ -68,6 +68,9 @@ public class Keyboard2 extends InputMethodService
   private float _dragStartY;
   private int _windowStartX;
   private int _windowStartY;
+  /** Size of the floating window, measured once when a drag starts. */
+  private int _dragWinW;
+  private int _dragWinH;
 
   /** Layout currently visible before it has been modified. */
   KeyboardData current_layout_unmodified()
@@ -447,10 +450,11 @@ public class Keyboard2 extends InputMethodService
             _windowStartY = lp.y;
             // Freeze the window size during the drag so it is not
             // re-measured on every move.
-            int h = getWindow().getWindow().getDecorView().getHeight();
-            if (h > 0)
+            _dragWinW = getWindow().getWindow().getDecorView().getWidth();
+            _dragWinH = getWindow().getWindow().getDecorView().getHeight();
+            if (_dragWinH > 0)
             {
-              lp.height = h;
+              lp.height = _dragWinH;
               getWindow().getWindow().setAttributes(lp);
             }
             v.getParent().requestDisallowInterceptTouchEvent(true);
@@ -459,8 +463,10 @@ public class Keyboard2 extends InputMethodService
             WindowManager.LayoutParams lp2 = getWindow().getWindow().getAttributes();
             int dx = (int)(event.getRawX() - _dragStartX);
             int dy = (int)(event.getRawY() - _dragStartY);
-            int winW = getWindow().getWindow().getDecorView().getWidth();
-            int winH = getWindow().getWindow().getDecorView().getHeight();
+            // Use the size measured at the start of the drag: reading it
+            // live can return a transient value and make the window jump.
+            int winW = _dragWinW;
+            int winH = _dragWinH;
             android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
             lp2.x = Math.max(0, Math.min(_windowStartX + dx, dm.widthPixels - winW));
             lp2.y = Math.max(0, Math.min(_windowStartY + dy, dm.heightPixels - winH));

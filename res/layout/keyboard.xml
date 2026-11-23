@@ -11,4 +11,5 @@
     <Button android:id="@+id/floating_toggle" style="@style/change_dictionary" android:background="@drawable/btn_floating_toggle" android:contentDescription="@string/floating_toggle_description"/>
   </juloo.keyboard2.suggestions.CandidatesView>
   <juloo.keyboard2.Keyboard2View android:id="@+id/keyboard_view" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  <juloo.keyboard2.FloatingResizeView android:id="@+id/floating_resize" android:layout_width="match_parent" android:layout_height="22dp" android:visibility="gone"/>
 </LinearLayout>

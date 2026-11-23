@@ -31,6 +31,10 @@ public final class Config
   public static final int FLOATING_KEYBOARD_MAX_WIDTH_DP = 700;
   /** Height scale applied to the rows of the keyboard in floating mode. */
   public static final float FLOATING_KEYBOARD_HEIGHT_SCALE = 0.75f;
+  /** Limits of the floating keyboard size when resized by the user. */
+  public static final int FLOATING_KEYBOARD_MIN_WIDTH_DP = 240;
+  public static final float FLOATING_KEYBOARD_MIN_HEIGHT_SCALE = 0.4f;
+  public static final float FLOATING_KEYBOARD_MAX_HEIGHT_SCALE = 1.5f;
 
   private final SharedPreferences _prefs;
 
@@ -85,6 +89,12 @@ public final class Config
   public boolean space_bar_auto_complete;
   public boolean physical_keyboard_hide;
   public boolean floating_keyboard;
+  /** Width of the floating keyboard, in pixels. */
+  public int floating_width;
+  /** Height of the floating keyboard rows relative to docked mode. */
+  public float floating_height_scale;
+  /** Row height in docked mode, before applying [floating_height_scale]. */
+  public int keyboard_rows_height_base;
 
   // Dynamically set
   /** Configuration options implied by the connected editor. */
@@ -193,8 +203,15 @@ public final class Config
     float base_height = Math.min(dm.heightPixels, dm.widthPixels * 16.f / 9.f);
     floating_keyboard = _prefs.getBoolean("floating_keyboard", false);
     keyboard_rows_height_pixels = (int)(base_height * keyboardHeightPercent / 395);
+    keyboard_rows_height_base = keyboard_rows_height_pixels;
+    floating_height_scale = clamp_floating_height_scale(
+        _prefs.getFloat("floating_height_scale", FLOATING_KEYBOARD_HEIGHT_SCALE));
+    floating_width = clamp_floating_width(dm, _prefs.getInt("floating_width",
+          (int)Math.min(dm.widthPixels * FLOATING_KEYBOARD_WIDTH_RATIO,
+            dm.density * FLOATING_KEYBOARD_MAX_WIDTH_DP)));
     if (floating_keyboard)
-      keyboard_rows_height_pixels *= FLOATING_KEYBOARD_HEIGHT_SCALE;
+      keyboard_rows_height_pixels =
+        (int)(keyboard_rows_height_base * floating_height_scale);
     horizontal_margin =
       get_dip_pref_oriented(dm, "horizontal_margin", 3, 28);
     double_tap_lock_shift = _prefs.getBoolean("lock_double_tap", false);
@@ -404,5 +421,17 @@ public final class Config
     if (name == null || name.equals("system"))
       return new LayoutsPreference.SystemLayout();
     return new LayoutsPreference.NamedLayout(name);
+  }
+
+  public static int clamp_floating_width(android.util.DisplayMetrics dm, int w)
+  {
+    int min = (int)(dm.density * FLOATING_KEYBOARD_MIN_WIDTH_DP);
+    return Math.max(Math.min(min, dm.widthPixels), Math.min(w, dm.widthPixels));
+  }
+
+  public static float clamp_floating_height_scale(float s)
+  {
+    return Math.max(FLOATING_KEYBOARD_MIN_HEIGHT_SCALE,
+        Math.min(s, FLOATING_KEYBOARD_MAX_HEIGHT_SCALE));
   }
 }

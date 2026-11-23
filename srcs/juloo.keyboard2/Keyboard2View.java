@@ -270,8 +270,7 @@ public class Keyboard2View extends View
     int width;
     if (_config.floating_keyboard)
     {
-      width = (int)Math.min(dm.widthPixels * Config.FLOATING_KEYBOARD_WIDTH_RATIO,
-          dm.density * Config.FLOATING_KEYBOARD_MAX_WIDTH_DP);
+      width = _config.floating_width;
     }
     else
     {

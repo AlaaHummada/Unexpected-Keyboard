@@ -177,6 +177,8 @@ public class Keyboard2 extends InputMethodService
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
     View handle = _keyboard_container_view.findViewById(R.id.floating_handle);
     handle.setOnTouchListener(_floatingHandleTouchListener);
+    View resize = _keyboard_container_view.findViewById(R.id.floating_resize);
+    resize.setOnTouchListener(_floatingResizeTouchListener);
   }
 
   InputMethodManager get_imm()
@@ -263,8 +265,12 @@ public class Keyboard2 extends InputMethodService
   private void updateFloatingHandleVisibility()
   {
     View handle = _keyboard_container_view.findViewById(R.id.floating_handle);
+    int vis = _config.floating_keyboard ? View.VISIBLE : View.GONE;
     if (handle != null)
-      handle.setVisibility(_config.floating_keyboard ? View.VISIBLE : View.GONE);
+      handle.setVisibility(vis);
+    View resize = _keyboard_container_view.findViewById(R.id.floating_resize);
+    if (resize != null)
+      resize.setVisibility(vis);
   }
 
   /** Toggle floating keyboard mode on and off from the keyboard. */
@@ -389,9 +395,7 @@ public class Keyboard2 extends InputMethodService
   /** Width of the floating keyboard, in pixels. */
   private int floatingWindowWidth()
   {
-    android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
-    return (int)Math.min(dm.widthPixels * Config.FLOATING_KEYBOARD_WIDTH_RATIO,
-        dm.density * Config.FLOATING_KEYBOARD_MAX_WIDTH_DP);
+    return _config.floating_width;
   }
 
   /** Position of the floating keyboard, loaded from the preferences or a
@@ -471,6 +475,82 @@ public class Keyboard2 extends InputMethodService
             panel.requestLayout();
             v.getParent().requestDisallowInterceptTouchEvent(false);
             return true;
+        }
+        return false;
+      }
+    };
+
+  /** State of a resize gesture. */
+  private boolean _resizeFromLeft;
+  private int _resizeStartWidth;
+  private float _resizeStartScale;
+  private int _resizeStartKbHeight;
+  private float _resizeStartTx;
+
+  /** Resize the floating keyboard from the grips at its bottom corners.
+      Dragging sideways changes the width, dragging up or down the height.
+      The size is applied live and saved when the finger is lifted. */
+  private final View.OnTouchListener _floatingResizeTouchListener =
+    new View.OnTouchListener()
+    {
+      @Override
+      public boolean onTouch(View v, MotionEvent event)
+      {
+        View panel = floatingPanel();
+        if (panel == null)
+          return false;
+        View decor = getWindow().getWindow().getDecorView();
+        switch (event.getActionMasked())
+        {
+          case MotionEvent.ACTION_DOWN:
+            _dragStartX = event.getRawX();
+            _dragStartY = event.getRawY();
+            _resizeFromLeft = event.getX() < v.getWidth() / 2.f;
+            _resizeStartWidth = panel.getWidth();
+            _resizeStartScale = _config.floating_height_scale;
+            _resizeStartKbHeight = Math.max(1, _keyboard_layout_view.getHeight());
+            _resizeStartTx = panel.getTranslationX();
+            v.getParent().requestDisallowInterceptTouchEvent(true);
+            return true;
+          case MotionEvent.ACTION_MOVE:
+          {
+            android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+            float dx = event.getRawX() - _dragStartX;
+            float dy = event.getRawY() - _dragStartY;
+            // Width: the opposite edge stays in place.
+            int maxW = _resizeFromLeft
+              ? (int)(_resizeStartTx + _resizeStartWidth)
+              : (int)(decor.getWidth() - _resizeStartTx);
+            int w = (int)(_resizeStartWidth + (_resizeFromLeft ? -dx : dx));
+            w = Math.min(Config.clamp_floating_width(dm, w), maxW);
+            float scale = Config.clamp_floating_height_scale(_resizeStartScale
+                * (_resizeStartKbHeight + dy) / _resizeStartKbHeight);
+            _config.floating_width = w;
+            _config.floating_height_scale = scale;
+            _config.keyboard_rows_height_pixels =
+              (int)(_config.keyboard_rows_height_base * scale);
+            if (_resizeFromLeft)
+              panel.setTranslationX(_resizeStartTx + _resizeStartWidth - w);
+            updateLayoutWidthOf(panel, w);
+            _keyboard_layout_view.requestLayout();
+            return true;
+          }
+          case MotionEvent.ACTION_UP:
+          case MotionEvent.ACTION_CANCEL:
+          {
+            // Keep the keyboard on screen after a resize.
+            float maxY = Math.max(0, decor.getHeight() - panel.getHeight());
+            if (panel.getTranslationY() > maxY)
+              panel.setTranslationY(maxY);
+            Config.globalPrefs().edit()
+              .putInt("floating_width", _config.floating_width)
+              .putFloat("floating_height_scale", _config.floating_height_scale)
+              .putInt(PREF_FLOATING_X, (int)panel.getTranslationX())
+              .putInt(PREF_FLOATING_Y, (int)panel.getTranslationY())
+              .apply();
+            v.getParent().requestDisallowInterceptTouchEvent(false);
+            return true;
+          }
         }
         return false;
       }

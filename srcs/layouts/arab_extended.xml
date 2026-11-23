@@ -48,7 +48,7 @@
     <key c="ت" n="ـ" sw="ٍ"/>
     <key c="ن" nw="&lt;" ne="&gt;" sw="ٰ"/>
     <key c="م" ne="/" se="\?" sw="ٓ"/>
-    <key c="ك" ne=":" se="گ" e="ڭ"/>
+    <key c="ك" ne="ڭ" nw=":" se="گ"/>
     <key c="ط" ne="'" se="&quot;"/>
   </row>
   <row>

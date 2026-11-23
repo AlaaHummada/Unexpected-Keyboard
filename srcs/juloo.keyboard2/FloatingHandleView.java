@@ -42,6 +42,14 @@ public class FloatingHandleView extends View
       float y = cy + i * spacing;
       canvas.drawLine(cx - width / 2.f, y, cx + width / 2.f, y, _paint);
     }
+    // Resize grips in the top corners
+    float s = dp(getContext(), 14);
+    float in = dp(getContext(), 6);
+    float r = getWidth() - in;
+    canvas.drawLine(in, in, in + s, in, _paint);
+    canvas.drawLine(in, in, in, in + s, _paint);
+    canvas.drawLine(r - s, in, r, in, _paint);
+    canvas.drawLine(r, in, r, in + s, _paint);
   }
 
   private static float dp(Context context, float value)

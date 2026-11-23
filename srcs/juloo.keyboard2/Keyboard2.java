@@ -176,7 +176,7 @@ public class Keyboard2 extends InputMethodService
     _keyboard_layout_view = (Keyboard2View)_keyboard_container_view.findViewById(R.id.keyboard_view);
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
     View handle = _keyboard_container_view.findViewById(R.id.floating_handle);
-    handle.setOnTouchListener(_floatingHandleTouchListener);
+    handle.setOnTouchListener(_floatingResizeTouchListener);
     View resize = _keyboard_container_view.findViewById(R.id.floating_resize);
     resize.setOnTouchListener(_floatingResizeTouchListener);
   }
@@ -310,6 +310,7 @@ public class Keyboard2 extends InputMethodService
     _keyboard_layout_view.setKeyboard(current_layout());
     _keyeventhandler.started();
     setInputView(_keyboard_container_view);
+    updateFloatingHandleVisibility();
     Logs.debug_startup_input_view(info, _config);
   }
 
@@ -489,6 +490,18 @@ public class Keyboard2 extends InputMethodService
   private float _resizeStartTx;
   /** The bottom bar gesture started in the middle: it moves the keyboard. */
   private boolean _bottomBarMoving;
+  /** Resizing from a top corner: the bottom edge stays in place. */
+  private boolean _resizeFromTop;
+  private float _resizeBottom;
+  private final View.OnLayoutChangeListener _keepBottomListener =
+    new View.OnLayoutChangeListener()
+    {
+      public void onLayoutChange(View p, int l, int t, int r, int b,
+          int ol, int ot, int or, int ob)
+      {
+        p.setTranslationY(Math.max(floatingMinY(), _resizeBottom - p.getHeight()));
+      }
+    };
 
   /** Width of the resize zone at each end of the bottom bar. */
   private int resizeCornerWidth(View bar)
@@ -538,6 +551,12 @@ public class Keyboard2 extends InputMethodService
             _resizeStartScale = _config.floating_height_scale;
             _resizeStartKbHeight = Math.max(1, _keyboard_layout_view.getHeight());
             _resizeStartTx = panel.getTranslationX();
+            _resizeFromTop = (v.getId() == R.id.floating_handle);
+            if (_resizeFromTop)
+            {
+              _resizeBottom = panel.getTranslationY() + panel.getHeight();
+              panel.addOnLayoutChangeListener(_keepBottomListener);
+            }
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return true;
           case MotionEvent.ACTION_MOVE:
@@ -551,6 +570,8 @@ public class Keyboard2 extends InputMethodService
               : (int)(decor.getWidth() - _resizeStartTx);
             int w = (int)(_resizeStartWidth + (_resizeFromLeft ? -dx : dx));
             w = Math.min(Config.clamp_floating_width(dm, w), maxW);
+            if (_resizeFromTop)
+              dy = -dy; // Dragging up makes it taller
             float scale = Config.clamp_floating_height_scale(_resizeStartScale
                 * (_resizeStartKbHeight + dy) / _resizeStartKbHeight);
             _config.floating_width = w;
@@ -566,6 +587,7 @@ public class Keyboard2 extends InputMethodService
           case MotionEvent.ACTION_UP:
           case MotionEvent.ACTION_CANCEL:
           {
+            panel.removeOnLayoutChangeListener(_keepBottomListener);
             // Keep the keyboard on screen after a resize.
             float maxY = Math.max(0, decor.getHeight() - panel.getHeight());
             if (panel.getTranslationY() > maxY)
@@ -656,6 +678,11 @@ public class Keyboard2 extends InputMethodService
     // Saving the floating window position must not rebuild the keyboard,
     // otherwise it flickers and jumps after each drag.
     if (PREF_FLOATING_X.equals(_key) || PREF_FLOATING_Y.equals(_key))
+      return;
+    // The settings run in the same process as the keyboard: rebuilding the
+    // hidden keyboard on every change made the settings stutter. Everything
+    // is refreshed anyway in [onStartInputView].
+    if (!isInputViewShown())
       return;
     refresh_config();
     _keyboard_layout_view.setKeyboard(current_layout());

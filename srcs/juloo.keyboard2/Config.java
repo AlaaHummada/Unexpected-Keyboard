@@ -95,6 +95,11 @@ public final class Config
   public float floating_height_scale;
   /** Row height in docked mode, before applying [floating_height_scale]. */
   public int keyboard_rows_height_base;
+  /** Preference storing the docked keyboard height for the current
+      orientation, its value and its maximum. */
+  public String keyboard_height_key;
+  public int keyboard_height_percent;
+  public int keyboard_height_max;
 
   // Dynamically set
   /** Configuration options implied by the connected editor. */
@@ -154,12 +159,16 @@ public final class Config
     {
       if ("landscape".equals(show_numpad_s))
         show_numpad = true;
-      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_landscape_unfolded" : "keyboard_height_landscape", 50);
+      keyboard_height_key = foldable_unfolded ? "keyboard_height_landscape_unfolded" : "keyboard_height_landscape";
+      keyboard_height_max = 65;
+      keyboardHeightPercent = _prefs.getInt(keyboard_height_key, 50);
       characterSizeScale = 1.25f;
     }
     else
     {
-      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_unfolded" : "keyboard_height", 35);
+      keyboard_height_key = foldable_unfolded ? "keyboard_height_unfolded" : "keyboard_height";
+      keyboard_height_max = foldable_unfolded ? 50 : 100;
+      keyboardHeightPercent = _prefs.getInt(keyboard_height_key, 35);
     }
     layouts = LayoutsPreference.load_from_preferences(res, _prefs);
     inverse_numpad = _prefs.getString("numpad_layout", "default").equals("low_first");
@@ -204,6 +213,7 @@ public final class Config
     floating_keyboard = _prefs.getBoolean("floating_keyboard", false);
     keyboard_rows_height_pixels = (int)(base_height * keyboardHeightPercent / 395);
     keyboard_rows_height_base = keyboard_rows_height_pixels;
+    keyboard_height_percent = keyboardHeightPercent;
     floating_height_scale = clamp_floating_height_scale(
         _prefs.getFloat("floating_height_scale", FLOATING_KEYBOARD_HEIGHT_SCALE));
     floating_width = clamp_floating_width(dm, _prefs.getInt("floating_width",

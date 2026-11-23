@@ -179,6 +179,8 @@ public class Keyboard2 extends InputMethodService
     handle.setOnTouchListener(_floatingResizeTouchListener);
     View resize = _keyboard_container_view.findViewById(R.id.floating_resize);
     resize.setOnTouchListener(_floatingResizeTouchListener);
+    View dock_resize = _keyboard_container_view.findViewById(R.id.docked_resize);
+    dock_resize.setOnTouchListener(_dockedResizeTouchListener);
   }
 
   InputMethodManager get_imm()
@@ -271,6 +273,9 @@ public class Keyboard2 extends InputMethodService
     View resize = _keyboard_container_view.findViewById(R.id.floating_resize);
     if (resize != null)
       resize.setVisibility(vis);
+    View dock_resize = _keyboard_container_view.findViewById(R.id.docked_resize);
+    if (dock_resize != null)
+      dock_resize.setVisibility(_config.floating_keyboard ? View.GONE : View.VISIBLE);
   }
 
   /** Toggle floating keyboard mode on and off from the keyboard. */
@@ -598,6 +603,58 @@ public class Keyboard2 extends InputMethodService
               .putInt(PREF_FLOATING_X, (int)panel.getTranslationX())
               .putInt(PREF_FLOATING_Y, (int)panel.getTranslationY())
               .apply();
+            v.getParent().requestDisallowInterceptTouchEvent(false);
+            return true;
+          }
+        }
+        return false;
+      }
+    };
+
+  /** Docked mode: drag the grip in the top-left corner up or down to change
+      the keyboard height. Saved in the usual "keyboard height" setting. */
+  private float _dockStartY;
+  private int _dockStartRows;
+  private int _dockStartKbHeight;
+  private final View.OnTouchListener _dockedResizeTouchListener =
+    new View.OnTouchListener()
+    {
+      @Override
+      public boolean onTouch(View v, MotionEvent event)
+      {
+        switch (event.getActionMasked())
+        {
+          case MotionEvent.ACTION_DOWN:
+            if (event.getX() > DockedResizeView.touchWidth(v))
+              return false;
+            _dockStartY = event.getRawY();
+            _dockStartRows = _config.keyboard_rows_height_pixels;
+            _dockStartKbHeight = Math.max(1, _keyboard_layout_view.getHeight());
+            v.getParent().requestDisallowInterceptTouchEvent(true);
+            return true;
+          case MotionEvent.ACTION_MOVE:
+          {
+            float ratio = (_dockStartKbHeight - (event.getRawY() - _dockStartY))
+              / _dockStartKbHeight;
+            int rows = (int)(_dockStartRows * ratio);
+            int base = Math.max(1, _config.keyboard_rows_height_base);
+            int percent = Math.round(_config.keyboard_height_percent
+                * (float)rows / base);
+            if (percent < 10 || percent > _config.keyboard_height_max)
+              return true;
+            _config.keyboard_rows_height_pixels = rows;
+            _keyboard_layout_view.requestLayout();
+            return true;
+          }
+          case MotionEvent.ACTION_UP:
+          case MotionEvent.ACTION_CANCEL:
+          {
+            int base = Math.max(1, _config.keyboard_rows_height_base);
+            int percent = Math.round(_config.keyboard_height_percent
+                * (float)_config.keyboard_rows_height_pixels / base);
+            percent = Math.max(10, Math.min(percent, _config.keyboard_height_max));
+            Config.globalPrefs().edit()
+              .putInt(_config.keyboard_height_key, percent).apply();
             v.getParent().requestDisallowInterceptTouchEvent(false);
             return true;
           }

@@ -10,6 +10,9 @@ on:
 jobs:
   Build-Apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
     - name: Checkout repo
       uses: actions/checkout@v7
@@ -86,3 +89,18 @@ jobs:
           }
           // Post comment
           await github.rest.issues.createComment({ ...args, body: body })
+
+    # Publish every master build as the latest GitHub release, so the APK is
+    # always at a fixed link:
+    # https://github.com/AlaaHummada/Unexpected-Keyboard/releases/latest/download/Unexpected-Keyboard.apk
+    - name: Publish release
+      if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cp build/outputs/apk/debug/*.apk Unexpected-Keyboard.apk
+        gh release delete latest-build --cleanup-tag --yes || true
+        gh release create latest-build Unexpected-Keyboard.apk \
+          --target "${{ github.sha }}" --latest \
+          --title "Personal build $(date -u +%Y-%m-%d) (${GITHUB_SHA::7})" \
+          --notes "Unexpected Keyboard with floating/resizable mode and personal layouts. Source: this repository (GPL-3.0). Based on Julow/Unexpected-Keyboard."

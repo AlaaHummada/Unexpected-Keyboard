@@ -230,7 +230,10 @@ public class Keyboard2 extends InputMethodService
     boolean should_show =
       _config.suggestions_enabled
       && _config.editor_config.should_show_candidates_view
-      && !_config.split_layout;
+      && !_config.split_layout
+      // Without a dictionary the strip only shows "Change language": hide
+      // it, except in floating mode where it holds the floating toggle.
+      && (_config.current_dictionary != null || _config.floating_keyboard);
     if (should_show)
     {
       _candidates_view.refresh_config(_config);

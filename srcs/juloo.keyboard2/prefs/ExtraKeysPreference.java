@@ -144,14 +144,10 @@ public class ExtraKeysPreference extends PreferenceCategory
       case "switch_greekmath":
       case "home":
       case "end":
-      case "page_up":
-      case "page_down":
       case "copy":
       case "cut":
       case "paste":
       case "selectAll":
-      case "undo":
-      case "redo":
       case "delete_word":
       case "forward_delete_word":
       case "alt":

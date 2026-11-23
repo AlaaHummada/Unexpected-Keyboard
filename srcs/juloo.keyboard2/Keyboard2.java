@@ -373,7 +373,7 @@ public class Keyboard2 extends InputMethodService
       updateLayoutGravityOf(panel, Gravity.TOP | Gravity.START);
       Point pos = getFloatingPosition();
       panel.setTranslationX(pos.x);
-      panel.setTranslationY(pos.y);
+      panel.setTranslationY(Math.max(pos.y, floatingMinY()));
     }
     else
     {
@@ -462,7 +462,8 @@ public class Keyboard2 extends InputMethodService
             int maxX = Math.max(0, decor.getWidth() - panel.getWidth());
             int maxY = Math.max(0, decor.getHeight() - panel.getHeight());
             panel.setTranslationX(Math.max(0, Math.min(_windowStartX + dx, maxX)));
-            panel.setTranslationY(Math.max(0, Math.min(_windowStartY + dy, maxY)));
+            int minY = Math.min(floatingMinY(), maxY);
+            panel.setTranslationY(Math.max(minY, Math.min(_windowStartY + dy, maxY)));
             return true;
           }
           case MotionEvent.ACTION_UP:
@@ -486,6 +487,25 @@ public class Keyboard2 extends InputMethodService
   private float _resizeStartScale;
   private int _resizeStartKbHeight;
   private float _resizeStartTx;
+  /** The bottom bar gesture started in the middle: it moves the keyboard. */
+  private boolean _bottomBarMoving;
+
+  /** Width of the resize zone at each end of the bottom bar. */
+  private int resizeCornerWidth(View bar)
+  {
+    float d = getResources().getDisplayMetrics().density;
+    return (int)Math.min(bar.getWidth() / 4.f, 72 * d);
+  }
+
+  /** Top limit for the floating keyboard, below the status bar so that
+      dragging it near the top doesn't pull down the notifications. */
+  private int floatingMinY()
+  {
+    View decor = getWindow().getWindow().getDecorView();
+    if (VERSION.SDK_INT >= 23 && decor.getRootWindowInsets() != null)
+      return decor.getRootWindowInsets().getStableInsetTop();
+    return 0;
+  }
 
   /** Resize the floating keyboard from the grips at its bottom corners.
       Dragging sideways changes the width, dragging up or down the height.
@@ -500,6 +520,14 @@ public class Keyboard2 extends InputMethodService
         if (panel == null)
           return false;
         View decor = getWindow().getWindow().getDecorView();
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
+        {
+          int corner = resizeCornerWidth(v);
+          _bottomBarMoving =
+            event.getX() > corner && event.getX() < v.getWidth() - corner;
+        }
+        if (_bottomBarMoving)
+          return _floatingHandleTouchListener.onTouch(v, event);
         switch (event.getActionMasked())
         {
           case MotionEvent.ACTION_DOWN:

@@ -51,6 +51,15 @@ public class FloatingResizeView extends View
     _path.lineTo(right, bottom);
     _path.lineTo(right, bottom - s);
     canvas.drawPath(_path, _paint);
+    // Grabber in the middle: dragging there moves the keyboard.
+    float gw = dp(32);
+    float cx = getWidth() / 2.f;
+    float cy = getHeight() / 2.f;
+    for (int i = -1; i <= 1; i += 2)
+    {
+      float y = cy + i * dp(3);
+      canvas.drawLine(cx - gw / 2, y, cx + gw / 2, y, _paint);
+    }
   }
 
   private float dp(float value)

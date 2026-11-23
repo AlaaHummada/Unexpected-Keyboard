@@ -221,6 +221,9 @@ public final class KeyModifier
     {
       case Char:
         char kc = k.getChar();
+        // Hiragana to katakana: same order, 0x60 code points further.
+        if (kc >= '\u3041' && kc <= '\u3096')
+          return k.withChar((char)(kc + 0x60));
         char c = Character.toUpperCase(kc);
         return (kc == c) ? k : k.withChar(c);
       case String:

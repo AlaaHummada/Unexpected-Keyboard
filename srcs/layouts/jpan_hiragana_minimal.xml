@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Flick-style kana: centre = a-row, left = i, up = u, right = e, down = o.
+     Shift (or caps lock) turns hiragana into katakana. -->
+<keyboard name="Hiragana Minimal" script="hiragana">
+  <row>
+    <key c="1" ne="&quot;" se="`" s="!" n="-"/>
+    <key c="2" ne="'" se="~" s="\@" n="_"/>
+    <key c="3" ne="," s="\#" n="="/>
+    <key c="4" ne="." s="$" n="+"/>
+    <key c="5" ne="/" s="%" n="["/>
+    <key c="6" ne=":" s="^" n="]"/>
+    <key c="7" ne=";" s="&amp;" n="{"/>
+    <key c="8" ne="\?" s="*" n="}"/>
+    <key c="9" ne="\\" s="(" n="&lt;"/>
+    <key c="0" ne="|" s=")" n="&gt;"/>
+  </row>
+  <row>
+    <key width="2" c="あ" w="い" n="う" e="え" s="お"/>
+    <key width="2" c="か" w="き" n="く" e="け" s="こ"/>
+    <key width="2" c="さ" w="し" n="す" e="せ" s="そ"/>
+    <key width="2" c="た" w="ち" n="つ" e="て" s="と" nw="っ"/>
+    <key width="2" c="な" w="に" n="ぬ" e="ね" s="の"/>
+  </row>
+  <row>
+    <key width="2" c="は" w="ひ" n="ふ" e="へ" s="ほ"/>
+    <key width="2" c="ま" w="み" n="む" e="め" s="も"/>
+    <key width="2" c="や" n="ゆ" s="よ" nw="ゃ" ne="ゅ" se="ょ" w="「" e="」"/>
+    <key width="2" c="ら" w="り" n="る" e="れ" s="ろ"/>
+    <key width="2" c="わ" w="を" n="ん" e="ー" s="ゎ"/>
+  </row>
+  <row>
+    <key width="2" c="が" w="ぎ" n="ぐ" e="げ" s="ご"/>
+    <key width="2" c="ざ" w="じ" n="ず" e="ぜ" s="ぞ"/>
+    <key width="2" c="だ" w="ぢ" n="づ" e="で" s="ど"/>
+    <key width="2" c="ば" w="び" n="ぶ" e="べ" s="ぼ"/>
+    <key width="2" c="ぱ" w="ぴ" n="ぷ" e="ぺ" s="ぽ"/>
+  </row>
+  <row>
+    <key width="2.5" role="action" c="shift" n="loc capslock"/>
+    <key width="2.5" c="ぁ" w="ぃ" n="ぅ" e="ぇ" s="ぉ" ne="ゔ"/>
+    <key width="2.5" c="、" n="。" w="？" e="！" s="・" ne="…" se="〜" nw="："/>
+    <key width="2.5" role="action" c="backspace" n="delete"/>
+  </row>
+</keyboard>

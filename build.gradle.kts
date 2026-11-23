@@ -83,10 +83,11 @@ android {
     named("debug") {
       isMinifyEnabled = false
       isShrinkResources = false
-      isDebuggable = true
+      // Not debuggable: debuggable apps run much slower (settings felt sluggish)
+      isDebuggable = false
       applicationIdSuffix = ".debug"
       resValue("string", "app_name", "@string/app_name_debug")
-      resValue("bool", "debug_logs", "true")
+      resValue("bool", "debug_logs", "false")
       signingConfig = signingConfigs["debug"]
     }
   }

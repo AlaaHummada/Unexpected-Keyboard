@@ -24,7 +24,8 @@ public class LayoutsPreference extends ListGroupPreference<LayoutsPreference.Lay
       (Layout)new NamedLayout("latn_qwerty_en_tr"),
       (Layout)new NamedLayout("arab_minimal"),
       (Layout)new NamedLayout("arab_extended"),
-      (Layout)new NamedLayout("latn_minimal"));
+      (Layout)new NamedLayout("latn_minimal"),
+      (Layout)new NamedLayout("jpan_hiragana_minimal"));
   static final ListGroupPreference.Serializer<Layout> SERIALIZER =
     new Serializer();
 

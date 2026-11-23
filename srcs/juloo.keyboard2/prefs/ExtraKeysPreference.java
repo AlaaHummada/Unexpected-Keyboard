@@ -140,6 +140,21 @@ public class ExtraKeysPreference extends PreferenceCategory
       case "esc":
       case "f11_placeholder":
       case "f12_placeholder":
+      case "capslock":
+      case "switch_greekmath":
+      case "home":
+      case "end":
+      case "page_up":
+      case "page_down":
+      case "copy":
+      case "cut":
+      case "paste":
+      case "selectAll":
+      case "undo":
+      case "redo":
+      case "delete_word":
+      case "forward_delete_word":
+      case "alt":
         return true;
       default:
         return false;

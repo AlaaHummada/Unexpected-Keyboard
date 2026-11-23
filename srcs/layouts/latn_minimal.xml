@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<keyboard name="Latin Minimal" script="latin">
+  <row>
+    <key c="1" s="!" n="-"/>
+    <key c="2" s="\@" n="_"/>
+    <key c="3" s="\#" n="="/>
+    <key c="4" s="$" n="+"/>
+    <key c="5" s="%" n="["/>
+    <key c="6" s="^" n="]"/>
+    <key c="7" s="&amp;" n="{"/>
+    <key c="8" s="*" n="}"/>
+    <key c="9" s="(" n="&lt;"/>
+    <key c="0" s=")" n="&gt;"/>
+  </row>
+  <row>
+    <key width="2" c="a" nw="loc tab" n="â" se="\\"/>
+    <key width="2" c="e" se="/" nw="loc esc"/>
+    <key width="2" c="i" n="ı" ne="İ" e="l" w="j" se="|"/>
+    <key width="2" c="o" n="ö" e="c" ne="ç" se="~"/>
+    <key width="2" c="u" n="ü" w="v" nw="w" se="`"/>
+  </row>
+  <row>
+    <key width="2" c="n" n="r" e="m" ne="h" se="&quot;"/>
+    <key width="2" c="s" n="ş" e="z"/>
+    <key width="2" c="t" n="f"/>
+    <key width="2" c="d" n="b" e="p" w="q"/>
+    <key width="2" c="k" n="x"/>
+  </row>
+  <row>
+    <key width="2.5" role="action" c="shift" n="loc capslock"/>
+    <key width="2.5" c="y" n="g" ne="ğ"/>
+    <key width="2.5" c="." n="," ne="\?" nw="…" e="'" w=";" s=":"/>
+    <key width="2.5" role="action" c="backspace" n="delete"/>
+  </row>
+</keyboard>

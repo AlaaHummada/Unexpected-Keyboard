@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<keyboard name="English Turkish" script="latin">
+  <row>
+    <key c="q" s="1" se="loc esc"/>
+    <key c="w" s="2"/>
+    <key c="e" s="3"/>
+    <key c="r" s="4"/>
+    <key c="t" s="5"/>
+    <key c="y" s="6"/>
+    <key c="u" s="7" n="ü"/>
+    <key c="i" s="8" n="ı" ne="İ"/>
+    <key c="o" s="9" n="ö"/>
+    <key c="p" s="0"/>
+  </row>
+  <row>
+    <key shift="0.5" c="a" nw="loc tab" s="\@" n="â" ne="~"/>
+    <key c="s" s="\#" n="ş"/>
+    <key c="d" s="$" n="^"/>
+    <key c="f" s="%" n="|"/>
+    <key c="g" s="&amp;" n="ğ"/>
+    <key c="h" s="&lt;" ne="=" nw="+"/>
+    <key c="j" s="(" ne="[" nw="{"/>
+    <key c="k" s=")" ne="]" nw="}"/>
+    <key c="l" s="&gt;" ne="*" nw="_"/>
+  </row>
+  <row>
+    <key role="action" c="shift" n="loc capslock"/>
+    <key c="z" s="-" n=":"/>
+    <key c="x" s="/" n=";"/>
+    <key c="c" n="ç" s=","/>
+    <key c="v" s="." n="&quot;"/>
+    <key c="b" s="\?" n="\\"/>
+    <key c="n" s="!" n="`"/>
+    <key c="m" s="'"/>
+    <key role="action" c="shift"/>
+    <key role="action" c="backspace" n="delete"/>
+  </row>
+</keyboard>

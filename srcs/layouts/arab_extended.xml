@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<keyboard name="Arabic Extended" script="arabic">
+  <row>
+    <key c="ض" ne="1" se="!"/>
+    <key c="ص" ne="2" se="\@"/>
+    <key c="ث" ne="3" se="\#"/>
+    <key c="ق" ne="4" se="$" s="ڨ"/>
+    <key c="ف" ne="5" nw="٪" se="%" s="ڤ"/>
+    <key c="غ" ne="6" se="^"/>
+    <key c="ع" ne="7" se="&amp;"/>
+    <key c="ه" ne="8" se="*" s="ھ" w="ہ"/>
+    <key c="خ" ne="9" se="("/>
+    <key c="ح" ne="0" se=")"/>
+    <key c="ج" ne="-" se="_" s="چ"/>
+    <key c="د" ne="=" se="+" s="ڈ"/>
+  </row>
+  <row>
+    <key c="ذ" sw="َ"/>
+    <key c="ش" sw="ُ"/>
+    <key c="س" sw="ِ"/>
+    <key c="ي" ne="[" s="ی" w="ێ" sw="ْ"/>
+    <key c="ب" ne="]" s="پ" sw="ّ"/>
+    <key c="ل" s="ڵ" sw="ً"/>
+    <key c="ا" n="أ" ne="إ" w="آ" sw="ٌ"/>
+    <key c="ت" n="ـ" s="ٹ" sw="ٍ"/>
+    <key c="ن" nw="&lt;" ne="&gt;" s="ں" sw="ٰ"/>
+    <key c="م" ne="/" se="\?" sw="ٓ"/>
+    <key c="ك" ne=":" s="گ" w="ک" e="ڭ"/>
+    <key c="ط" ne="'" se="&quot;"/>
+  </row>
+  <row>
+    <key shift="0.5" c="ئ" ne="~"/>
+    <key c="ء" ne="`"/>
+    <key c="ؤ" ne="{" s="ۆ"/>
+    <key c="ر" ne="}" s="ڕ" w="ڑ"/>
+    <key c="لا" n="لأ" ne="لإ" w="لآ"/>
+    <key c="ى" ne="\\" s="ے"/>
+    <key c="ة" ne="|" s="ە"/>
+    <key c="و" ne="،" se="," nw=";" s="ۇ"/>
+    <key c="ز" ne="." nw="٫" se="٬" s="ژ"/>
+    <key c="ظ" ne="؟" se="؛" w="«" e="»"/>
+    <key width="1.5" role="action" c="backspace" n="delete"/>
+  </row>
+</keyboard>

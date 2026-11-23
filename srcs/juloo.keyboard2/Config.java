@@ -219,7 +219,7 @@ public final class Config
       _prefs.getFloat("character_size", 1.15f)
       * characterSizeScale;
     theme = getThemeId(res, _prefs.getString("theme", ""));
-    autocapitalisation = _prefs.getBoolean("autocapitalisation", true);
+    autocapitalisation = _prefs.getBoolean("autocapitalisation", false);
     change_method_key_replacement = get_change_method_key_replacement(_prefs);
     extra_keys_param = ExtraKeysPreference.get_extra_keys(_prefs);
     extra_keys_custom = CustomExtraKeysPreference.get(_prefs);
@@ -332,7 +332,7 @@ public final class Config
 
   final boolean get_split_layout()
   {
-    switch (_prefs.getString("split_layout", "wide"))
+    switch (_prefs.getString("split_layout", "never"))
     {
       case "wide": return wide_screen;
       case "landscape": return orientation_landscape;

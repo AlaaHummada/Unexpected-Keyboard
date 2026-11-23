@@ -20,8 +20,11 @@ import org.json.JSONObject;
 public class LayoutsPreference extends ListGroupPreference<LayoutsPreference.Layout>
 {
   static final String KEY = "layouts";
-  static final List<Layout> DEFAULT =
-    Collections.singletonList((Layout)new SystemLayout());
+  static final List<Layout> DEFAULT = java.util.Arrays.asList(
+      (Layout)new NamedLayout("latn_qwerty_en_tr"),
+      (Layout)new NamedLayout("arab_minimal"),
+      (Layout)new NamedLayout("arab_extended"),
+      (Layout)new NamedLayout("latn_minimal"));
   static final ListGroupPreference.Serializer<Layout> SERIALIZER =
     new Serializer();
 

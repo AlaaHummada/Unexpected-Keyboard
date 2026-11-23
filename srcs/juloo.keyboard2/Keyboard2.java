@@ -68,9 +68,6 @@ public class Keyboard2 extends InputMethodService
   private float _dragStartY;
   private int _windowStartX;
   private int _windowStartY;
-  /** Size of the floating window, measured once when a drag starts. */
-  private int _dragWinW;
-  private int _dragWinH;
 
   /** Layout currently visible before it has been modified. */
   KeyboardData current_layout_unmodified()
@@ -333,16 +330,13 @@ public class Keyboard2 extends InputMethodService
   }
 
   private void updateSoftInputWindowLayoutParams() {
-    if (_config.floating_keyboard)
-    {
-      applyFloatingWindow();
-      return;
-    }
     final Window window = getWindow().getWindow();
-    // Restore the docked layout when leaving floating mode
+    // The IME window always fills the screen. In floating mode the window
+    // never moves: only the keyboard panel inside it is translated, which
+    // avoids the flicker caused by repositioning a system window.
     WindowManager.LayoutParams wattrs = window.getAttributes();
     if (wattrs.width != ViewGroup.LayoutParams.MATCH_PARENT
-        || wattrs.gravity != Gravity.BOTTOM)
+        || wattrs.gravity != Gravity.BOTTOM || wattrs.x != 0 || wattrs.y != 0)
     {
       wattrs.width = ViewGroup.LayoutParams.MATCH_PARENT;
       wattrs.gravity = Gravity.BOTTOM;
@@ -362,36 +356,37 @@ public class Keyboard2 extends InputMethodService
     }
     updateLayoutHeightOf(window, ViewGroup.LayoutParams.MATCH_PARENT);
     final View inputArea = window.findViewById(android.R.id.inputArea);
-
-    updateLayoutHeightOf(
-            (View) inputArea.getParent(),
+    final View panel = (View)inputArea.getParent();
+    updateLayoutHeightOf(panel,
             isFullscreenMode()
                     ? ViewGroup.LayoutParams.MATCH_PARENT
                     : ViewGroup.LayoutParams.WRAP_CONTENT);
-    updateLayoutGravityOf((View) inputArea.getParent(), Gravity.BOTTOM);
-
+    if (_config.floating_keyboard)
+    {
+      updateLayoutWidthOf(panel, floatingWindowWidth());
+      updateLayoutGravityOf(panel, Gravity.TOP | Gravity.START);
+      Point pos = getFloatingPosition();
+      panel.setTranslationX(pos.x);
+      panel.setTranslationY(pos.y);
+    }
+    else
+    {
+      updateLayoutWidthOf(panel, ViewGroup.LayoutParams.MATCH_PARENT);
+      updateLayoutGravityOf(panel, Gravity.BOTTOM);
+      panel.setTranslationX(0);
+      panel.setTranslationY(0);
+    }
+    panel.requestLayout();
   }
 
-  /** Make the IME window a small floating window at the stored position. */
-  private void applyFloatingWindow()
+  /** The view that contains the keyboard, moved around in floating mode. */
+  private View floatingPanel()
   {
-    if (!_config.floating_keyboard)
-      return;
-    final Window window = getWindow().getWindow();
-    final WindowManager.LayoutParams lp = window.getAttributes();
-    Point pos = getFloatingPosition();
-    lp.gravity = Gravity.TOP | Gravity.START;
-    lp.width = floatingWindowWidth();
-    lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-    lp.x = pos.x;
-    lp.y = pos.y;
-    // No system animation when the window is repositioned (some OEM ROMs
-    // animate every position change, which looks like flickering).
-    lp.windowAnimations = 0;
-    window.setAttributes(lp);
+    View inputArea = getWindow().getWindow().findViewById(android.R.id.inputArea);
+    return (inputArea == null) ? null : (View)inputArea.getParent();
   }
 
-  /** Width of the floating keyboard window, in pixels. */
+  /** Width of the floating keyboard, in pixels. */
   private int floatingWindowWidth()
   {
     android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -399,7 +394,7 @@ public class Keyboard2 extends InputMethodService
         dm.density * Config.FLOATING_KEYBOARD_MAX_WIDTH_DP);
   }
 
-  /** Position of the floating window, loaded from the preferences or a
+  /** Position of the floating keyboard, loaded from the preferences or a
       default position (centered horizontally, ~25% from the top). */
   private Point getFloatingPosition()
   {
@@ -414,82 +409,80 @@ public class Keyboard2 extends InputMethodService
   }
 
   @Override
-  public void onConfigureWindow(Window window, boolean isFullscreen,
-      boolean isCandidatesOnly)
-  {
-    super.onConfigureWindow(window, isFullscreen, isCandidatesOnly);
-    applyFloatingWindow();
-  }
-
-  @Override
   public void onComputeInsets(Insets outInsets)
   {
     super.onComputeInsets(outInsets);
-    // Report zero insets in floating mode so the app behind is not resized.
-    if (_config.floating_keyboard)
-    {
-      outInsets.contentTopInsets = 0;
-      outInsets.visibleTopInsets = 0;
-    }
+    if (!_config.floating_keyboard)
+      return;
+    View panel = floatingPanel();
+    View decor = getWindow().getWindow().getDecorView();
+    if (panel == null)
+      return;
+    // The app behind is not resized and only the keyboard itself receives
+    // touches; the rest of the full-screen IME window lets them through.
+    int h = decor.getHeight();
+    outInsets.contentTopInsets = h;
+    outInsets.visibleTopInsets = h;
+    int[] loc = new int[2];
+    panel.getLocationInWindow(loc); // Includes the translation
+    outInsets.touchableInsets = Insets.TOUCHABLE_INSETS_REGION;
+    outInsets.touchableRegion.set(loc[0], loc[1],
+        loc[0] + panel.getWidth(), loc[1] + panel.getHeight());
   }
 
-  /** Drag the floating window from its handle. */
+  /** Drag the floating keyboard from its handle. Only the view is moved,
+      the window stays in place. */
   private final View.OnTouchListener _floatingHandleTouchListener =
     new View.OnTouchListener()
     {
       @Override
       public boolean onTouch(View v, MotionEvent event)
       {
+        View panel = floatingPanel();
+        if (panel == null)
+          return false;
         switch (event.getActionMasked())
         {
           case MotionEvent.ACTION_DOWN:
             _dragStartX = event.getRawX();
             _dragStartY = event.getRawY();
-            WindowManager.LayoutParams lp = getWindow().getWindow().getAttributes();
-            _windowStartX = lp.x;
-            _windowStartY = lp.y;
-            // Freeze the window size during the drag so it is not
-            // re-measured on every move.
-            _dragWinW = getWindow().getWindow().getDecorView().getWidth();
-            _dragWinH = getWindow().getWindow().getDecorView().getHeight();
-            if (_dragWinH > 0)
-            {
-              lp.height = _dragWinH;
-              getWindow().getWindow().setAttributes(lp);
-            }
+            _windowStartX = (int)panel.getTranslationX();
+            _windowStartY = (int)panel.getTranslationY();
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return true;
           case MotionEvent.ACTION_MOVE:
-            WindowManager.LayoutParams lp2 = getWindow().getWindow().getAttributes();
+          {
+            View decor = getWindow().getWindow().getDecorView();
             int dx = (int)(event.getRawX() - _dragStartX);
             int dy = (int)(event.getRawY() - _dragStartY);
-            // Use the size measured at the start of the drag: reading it
-            // live can return a transient value and make the window jump.
-            int winW = _dragWinW;
-            int winH = _dragWinH;
-            android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
-            lp2.x = Math.max(0, Math.min(_windowStartX + dx, dm.widthPixels - winW));
-            lp2.y = Math.max(0, Math.min(_windowStartY + dy, dm.heightPixels - winH));
-            getWindow().getWindow().setAttributes(lp2);
+            int maxX = Math.max(0, decor.getWidth() - panel.getWidth());
+            int maxY = Math.max(0, decor.getHeight() - panel.getHeight());
+            panel.setTranslationX(Math.max(0, Math.min(_windowStartX + dx, maxX)));
+            panel.setTranslationY(Math.max(0, Math.min(_windowStartY + dy, maxY)));
             return true;
+          }
           case MotionEvent.ACTION_UP:
           case MotionEvent.ACTION_CANCEL:
-            WindowManager.LayoutParams lp3 = getWindow().getWindow().getAttributes();
-            if (lp3.height != ViewGroup.LayoutParams.WRAP_CONTENT)
-            {
-              lp3.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-              getWindow().getWindow().setAttributes(lp3);
-            }
             Config.globalPrefs().edit()
-              .putInt(PREF_FLOATING_X, lp3.x)
-              .putInt(PREF_FLOATING_Y, lp3.y)
+              .putInt(PREF_FLOATING_X, (int)panel.getTranslationX())
+              .putInt(PREF_FLOATING_Y, (int)panel.getTranslationY())
               .apply();
+            // Recompute the touchable region at the new position.
+            panel.requestLayout();
             v.getParent().requestDisallowInterceptTouchEvent(false);
             return true;
         }
         return false;
       }
     };
+
+  private static void updateLayoutWidthOf(final View view, final int layoutWidth) {
+    final ViewGroup.LayoutParams params = view.getLayoutParams();
+    if (params != null && params.width != layoutWidth) {
+      params.width = layoutWidth;
+      view.setLayoutParams(params);
+    }
+  }
 
   private static void updateLayoutHeightOf(final Window window, final int layoutHeight) {
     final WindowManager.LayoutParams params = window.getAttributes();

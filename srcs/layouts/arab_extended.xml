@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shift gives the extra letters used in Persian, Urdu, Kurdish and
+<!-- ڤ ڨ گ پ ژ چ are on a bottom diagonal swipe of their base letter.
+     Shift gives the extra letters used in Persian, Urdu, Kurdish and
      Maghrebi Arabic (پ چ ژ ڤ گ ...). Harakat are on the bottom-left swipe of
      the second row. -->
 <keyboard name="Arabic Extended" script="arabic">
@@ -14,7 +15,7 @@
     <shift a="ل" b="ڵ"/>
     <shift a="ت" b="ٹ"/>
     <shift a="ن" b="ں"/>
-    <shift a="ك" b="گ"/>
+    <shift a="ك" b="ک"/>
     <shift a="ر" b="ڑ"/>
     <shift a="ى" b="ے"/>
     <shift a="ة" b="ە"/>
@@ -26,14 +27,14 @@
     <key c="ض" ne="1" se="!"/>
     <key c="ص" ne="2" se="\@"/>
     <key c="ث" ne="3" se="\#"/>
-    <key c="ق" ne="4" se="$"/>
-    <key c="ف" ne="5" nw="٪" se="%"/>
+    <key c="ق" ne="4" se="$" sw="ڨ"/>
+    <key c="ف" ne="5" nw="٪" se="%" sw="ڤ"/>
     <key c="غ" ne="6" se="^"/>
     <key c="ع" ne="7" se="&amp;"/>
     <key c="ه" ne="8" se="*" w="ہ"/>
     <key c="خ" ne="9" se="("/>
     <key c="ح" ne="0" se=")"/>
-    <key c="ج" ne="-" se="_"/>
+    <key c="ج" ne="-" se="_" sw="چ"/>
     <key c="د" ne="=" se="+"/>
   </row>
   <row>
@@ -41,13 +42,13 @@
     <key c="ش" sw="ُ"/>
     <key c="س" sw="ِ"/>
     <key c="ي" n="ئ" ne="[" w="ێ" sw="ْ"/>
-    <key c="ب" ne="]" sw="ّ"/>
+    <key c="ب" ne="]" sw="ّ" se="پ"/>
     <key c="ل" sw="ً"/>
     <key c="ا" n="أ" ne="إ" w="آ" sw="ٌ"/>
     <key c="ت" n="ـ" sw="ٍ"/>
     <key c="ن" nw="&lt;" ne="&gt;" sw="ٰ"/>
     <key c="م" ne="/" se="\?" sw="ٓ"/>
-    <key c="ك" ne=":" w="ک" e="ڭ"/>
+    <key c="ك" ne=":" se="گ" e="ڭ"/>
     <key c="ط" ne="'" se="&quot;"/>
   </row>
   <row>
@@ -59,7 +60,7 @@
     <key c="ى" ne="\\"/>
     <key c="ة" ne="|"/>
     <key c="و" ne="،" se="," nw=";"/>
-    <key c="ز" ne="." nw="٫" se="٬"/>
+    <key c="ز" ne="." nw="٫" se="٬" sw="ژ"/>
     <key c="ظ" ne="؟" se="؛" w="«" e="»"/>
     <key width="1.5" role="action" c="backspace" n="delete"/>
   </row>

@@ -27,24 +27,24 @@
     <key c="ض" ne="1" se="!"/>
     <key c="ص" ne="2" se="\@"/>
     <key c="ث" ne="3" se="\#"/>
-    <key c="ق" ne="4" se="$" sw="ڨ"/>
-    <key c="ف" ne="5" nw="٪" se="%" sw="ڤ"/>
+    <key c="ق" ne="4" w="$" sw="ڨ"/>
+    <key c="ف" ne="5" nw="٪" w="%" sw="ڤ"/>
     <key c="غ" ne="6" se="^"/>
     <key c="ع" ne="7" se="&amp;"/>
     <key c="ه" ne="8" se="*" w="ہ"/>
     <key c="خ" ne="9" se="("/>
     <key c="ح" ne="0" se=")"/>
-    <key c="ج" ne="-" se="_" sw="چ"/>
+    <key c="ج" ne="-" w="_" sw="چ"/>
     <key c="د" ne="=" se="+"/>
   </row>
   <row>
     <key c="ذ" sw="َ"/>
     <key c="ش" sw="ُ"/>
     <key c="س" sw="ِ"/>
-    <key c="ي" n="ئ" ne="[" w="ێ" sw="ْ"/>
+    <key c="ي" nw="ئ" ne="[" w="ێ" sw="ْ"/>
     <key c="ب" ne="]" sw="ّ" se="پ"/>
     <key c="ل" sw="ً"/>
-    <key c="ا" n="أ" ne="إ" w="آ" sw="ٌ"/>
+    <key c="ا" nw="أ" ne="إ" w="آ" sw="ٌ"/>
     <key c="ت" n="ـ" sw="ٍ"/>
     <key c="ن" nw="&lt;" ne="&gt;" sw="ٰ"/>
     <key c="م" ne="/" se="\?" sw="ٓ"/>
@@ -56,11 +56,11 @@
     <key c="ء" nw="~" ne="`"/>
     <key c="ؤ" ne="{"/>
     <key c="ر" ne="}" s="ڕ"/>
-    <key c="لا" n="لأ" ne="لإ" w="لآ"/>
+    <key c="لا" nw="لأ" ne="لإ" w="لآ"/>
     <key c="ى" ne="\\"/>
     <key c="ة" ne="|"/>
     <key c="و" ne="،" se="," nw=";"/>
-    <key c="ز" ne="." nw="٫" se="٬" sw="ژ"/>
+    <key c="ز" ne="." nw="٫" e="٬" sw="ژ"/>
     <key c="ظ" ne="؟" se="؛" w="«" e="»"/>
     <key width="1.5" role="action" c="backspace" n="delete"/>
   </row>

@@ -291,6 +291,7 @@ public class Keyboard2 extends InputMethodService
     _keyboard_layout_view.setKeyboard(current_layout());
     updateSoftInputWindowLayoutParams();
     updateFloatingHandleVisibility();
+    refresh_candidates_view();
   }
 
   private KeyboardData refresh_special_layout()

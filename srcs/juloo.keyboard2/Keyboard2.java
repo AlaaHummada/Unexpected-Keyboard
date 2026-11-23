@@ -382,6 +382,9 @@ public class Keyboard2 extends InputMethodService
     lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
     lp.x = pos.x;
     lp.y = pos.y;
+    // No system animation when the window is repositioned (some OEM ROMs
+    // animate every position change, which looks like flickering).
+    lp.windowAnimations = 0;
     window.setAttributes(lp);
   }
 
@@ -442,6 +445,14 @@ public class Keyboard2 extends InputMethodService
             WindowManager.LayoutParams lp = getWindow().getWindow().getAttributes();
             _windowStartX = lp.x;
             _windowStartY = lp.y;
+            // Freeze the window size during the drag so it is not
+            // re-measured on every move.
+            int h = getWindow().getWindow().getDecorView().getHeight();
+            if (h > 0)
+            {
+              lp.height = h;
+              getWindow().getWindow().setAttributes(lp);
+            }
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return true;
           case MotionEvent.ACTION_MOVE:
@@ -458,6 +469,11 @@ public class Keyboard2 extends InputMethodService
           case MotionEvent.ACTION_UP:
           case MotionEvent.ACTION_CANCEL:
             WindowManager.LayoutParams lp3 = getWindow().getWindow().getAttributes();
+            if (lp3.height != ViewGroup.LayoutParams.WRAP_CONTENT)
+            {
+              lp3.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+              getWindow().getWindow().setAttributes(lp3);
+            }
             Config.globalPrefs().edit()
               .putInt(PREF_FLOATING_X, lp3.x)
               .putInt(PREF_FLOATING_Y, lp3.y)

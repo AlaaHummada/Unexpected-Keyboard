@@ -175,6 +175,8 @@ public class Keyboard2View extends View
 
   public void onPointerDown(KeyValue k, boolean isSwipe)
   {
+    if (!isSwipe)
+      KeySounds.instance(getContext()).play(_config, k);
     updateFlags();
     _config.handler.key_down(k, isSwipe);
     invalidate();

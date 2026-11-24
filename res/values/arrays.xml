@@ -101,6 +101,16 @@
     <item>@string/pref_number_entry_layout_number</item>
     <item>@string/pref_number_entry_layout_normal</item>
   </string-array>
+  <string-array name="pref_key_sound_entries">
+    <item>@string/pref_key_sound_off</item>
+    <item>@string/pref_key_sound_system</item>
+    <item>@string/pref_key_sound_custom</item>
+  </string-array>
+  <string-array name="pref_key_sound_values">
+    <item>off</item>
+    <item>system</item>
+    <item>custom</item>
+  </string-array>
   <string-array name="pref_number_entry_values">
     <item>pin</item>
     <item>number</item>

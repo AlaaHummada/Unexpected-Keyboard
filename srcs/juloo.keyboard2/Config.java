@@ -61,6 +61,11 @@ public final class Config
   public boolean suggestions_add_space;
   // Let the system handle vibration when false.
   public boolean vibrate_custom;
+  /** "off", "system" or "custom", see [KeySounds]. */
+  public String key_sound_mode;
+  public int key_sound_volume; // 0 - 100
+  /** Darkening of the background picture, 0 - 255. */
+  public int background_dim;
   // Control the vibration if [vibrate_custom] is true.
   public long vibrate_duration;
   public long longPressTimeout;
@@ -190,6 +195,9 @@ public final class Config
     float slider_sensitivity = Float.valueOf(_prefs.getString("slider_sensitivity", "30")) / 100.f;
     slide_step_px = slider_sensitivity * swipe_scaling;
     vibrate_custom = _prefs.getBoolean("vibrate_custom", false);
+    key_sound_mode = _prefs.getString("key_sound", "off");
+    key_sound_volume = _prefs.getInt("key_sound_volume", 50);
+    background_dim = _prefs.getInt("background_dim", 25) * 255 / 100;
     vibrate_duration = _prefs.getInt("vibrate_duration", 20);
     longPressTimeout = _prefs.getInt("longpress_timeout", 600);
     longPressInterval = _prefs.getInt("longpress_interval", 65);

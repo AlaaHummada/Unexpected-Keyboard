@@ -63,6 +63,9 @@ public class Keyboard2 extends InputMethodService
 
   private FoldStateTracker _foldStateTracker;
 
+  /** Theme background of [_keyboard_container_view]. */
+  private Drawable _default_background = null;
+
   /** Drag state of the floating keyboard handle. */
   private float _dragStartX;
   private float _dragStartY;
@@ -205,6 +208,7 @@ public class Keyboard2 extends InputMethodService
   private void create_keyboard_view()
   {
     _keyboard_container_view = (ViewGroup)inflate_view(R.layout.keyboard);
+    _default_background = null;
     _keyboard_layout_view = (Keyboard2View)_keyboard_container_view.findViewById(R.id.keyboard_view);
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
     _keyboard_layout_view.set_layout_picker(_layout_picker);
@@ -290,10 +294,17 @@ public class Keyboard2 extends InputMethodService
       _clipboard_pane = null;
       setInputView(_keyboard_container_view);
     }
-    // Set keyboard background opacity
-    Drawable bg = _keyboard_container_view.getBackground().mutate();
+    // Set keyboard background: the user's picture if any, otherwise the
+    // theme color. Opacity applies to both.
+    if (_default_background == null)
+      _default_background = _keyboard_container_view.getBackground();
+    android.graphics.Bitmap pic = CustomAssets.background(this);
+    Drawable bg = (pic != null)
+      ? new CustomAssets.CoverDrawable(pic, _config.background_dim)
+      : _default_background.mutate();
     bg.setAlpha(_config.keyboardOpacity);
     _keyboard_container_view.setBackground(bg);
+    KeySounds.instance(this).refresh(_config);
     _keyboard_layout_view.reset();
     updateFloatingHandleVisibility();
     refresh_candidates_view();

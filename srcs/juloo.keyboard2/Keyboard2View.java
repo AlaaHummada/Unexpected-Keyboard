@@ -198,6 +198,161 @@ public class Keyboard2View extends View
     VibratorCompat.vibrate(this, _config, vibration_mode);
   }
 
+  // Layout picker, shown while the space bar is held.
+
+  public interface LayoutPickerCallback
+  {
+    public String[] layout_names();
+    public int current_layout();
+    public void select_layout(int i);
+  }
+
+  private LayoutPickerCallback _picker_cb = null;
+  private String[] _picker_items = null;
+  private RectF[] _picker_rects = null;
+  private RectF _picker_panel = new RectF();
+  private int _picker_sel = -1;
+  private int _picker_current = -1;
+  private float _picker_start_x, _picker_start_y;
+  private boolean _picker_moved = false;
+  private final Paint _picker_bg = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint _picker_hl = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint _picker_border = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint _picker_text = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+  public void set_layout_picker(LayoutPickerCallback cb)
+  {
+    _picker_cb = cb;
+  }
+
+  public boolean onPickerStart(float x, float y)
+  {
+    if (_picker_cb == null || _tc == null)
+      return false;
+    String[] names = _picker_cb.layout_names();
+    if (names == null || names.length < 2)
+      return false;
+    int n = names.length;
+    // Prefer a single column: shrink the items a bit to fit above the finger.
+    float fit = (y - _tc.row_height * 0.8f) / n;
+    float item_h = Math.max(_tc.row_height * 0.55f,
+        Math.min(_tc.row_height * 0.85f, fit));
+    float pad = item_h * 0.15f;
+    _picker_text.setTextSize(item_h * 0.42f);
+    _picker_text.setTextAlign(Paint.Align.CENTER);
+    float max_w = 0;
+    for (String s : names)
+      max_w = Math.max(max_w, _picker_text.measureText("✓ " + s));
+    float item_w = Math.max(max_w + item_h, getWidth() * 0.3f);
+    // Fit above the finger, using several columns if needed.
+    float avail = Math.max(item_h, y - item_h * 0.7f - pad * 2);
+    int rows = Math.max(1, Math.min(n, (int)(avail / item_h)));
+    int cols = (n + rows - 1) / rows;
+    rows = (n + cols - 1) / cols;
+    item_w = Math.min(item_w, (getWidth() - pad * 2) / cols);
+    float w = item_w * cols + pad * 2;
+    float h = item_h * rows + pad * 2;
+    float left = Math.max(0, Math.min(x - w / 2, getWidth() - w));
+    float bottom = y - item_h * 0.7f;
+    float top = Math.max(0, bottom - h);
+    _picker_panel.set(left, top, left + w, top + h);
+    _picker_rects = new RectF[n];
+    for (int i = 0; i < n; i++)
+    {
+      // Fill columns from the bottom up, nearest to the finger first.
+      int c = i / rows, r = rows - 1 - (i % rows);
+      float l = left + pad + c * item_w, t = top + pad + r * item_h;
+      _picker_rects[i] = new RectF(l, t, l + item_w, t + item_h);
+    }
+    _picker_items = names;
+    _picker_current = _picker_cb.current_layout();
+    _picker_sel = _picker_current;
+    _picker_start_x = x;
+    _picker_start_y = y;
+    _picker_moved = false;
+    _picker_bg.setColor(_theme.colorKey);
+    _picker_bg.setAlpha(255);
+    _picker_hl.setColor(_theme.colorKeyActivated);
+    _picker_hl.setAlpha(255);
+    _picker_border.setColor(_theme.labelColor);
+    _picker_border.setAlpha(60);
+    _picker_border.setStyle(Paint.Style.STROKE);
+    _picker_border.setStrokeWidth(Math.max(1, item_h * 0.02f));
+    vibrate();
+    invalidate();
+    return true;
+  }
+
+  public void onPickerMove(float x, float y)
+  {
+    if (_picker_items == null)
+      return;
+    if (!_picker_moved)
+    {
+      if (Math.abs(x - _picker_start_x) + Math.abs(y - _picker_start_y)
+          < _config.swipe_dist_px)
+        return;
+      _picker_moved = true;
+    }
+    RectF p = _picker_panel;
+    float item_h = _picker_rects[0].height();
+    int sel = -1;
+    // Finger far outside the list cancels; otherwise the nearest item wins.
+    if (x >= p.left - item_h && x <= p.right + item_h && y >= p.top - item_h)
+    {
+      float cx = Math.max(p.left + 1, Math.min(x, p.right - 1));
+      float cy = Math.max(p.top + 1, Math.min(y, p.bottom - 1));
+      float best = Float.MAX_VALUE;
+      for (int i = 0; i < _picker_rects.length; i++)
+      {
+        RectF r = _picker_rects[i];
+        float dx = Math.max(0, Math.max(r.left - cx, cx - r.right));
+        float dy = Math.max(0, Math.max(r.top - cy, cy - r.bottom));
+        float d = dx * dx + dy * dy;
+        if (d < best) { best = d; sel = i; }
+      }
+    }
+    if (sel != _picker_sel)
+    {
+      _picker_sel = sel;
+      if (sel >= 0)
+        vibrate();
+      invalidate();
+    }
+  }
+
+  public void onPickerEnd(boolean commit)
+  {
+    int sel = _picker_sel;
+    _picker_items = null;
+    _picker_rects = null;
+    _picker_sel = -1;
+    invalidate();
+    if (commit && sel >= 0 && sel != _picker_current && _picker_cb != null)
+      _picker_cb.select_layout(sel);
+  }
+
+  private void drawLayoutPicker(Canvas canvas)
+  {
+    if (_picker_items == null)
+      return;
+    float r = _picker_rects[0].height() * 0.25f;
+    canvas.drawRoundRect(_picker_panel, r, r, _picker_bg);
+    canvas.drawRoundRect(_picker_panel, r, r, _picker_border);
+    Paint.FontMetrics fm = _picker_text.getFontMetrics();
+    for (int i = 0; i < _picker_items.length; i++)
+    {
+      RectF rect = _picker_rects[i];
+      boolean hl = (i == _picker_sel);
+      if (hl)
+        canvas.drawRoundRect(rect, r, r, _picker_hl);
+      _picker_text.setColor(hl ? _theme.activatedColor : _theme.labelColor);
+      String label = (i == _picker_current ? "✓ " : "") + _picker_items[i];
+      float ty = rect.centerY() - (fm.ascent + fm.descent) / 2;
+      canvas.drawText(label, rect.centerX(), ty, _picker_text);
+    }
+  }
+
   public void onPointerFlagsChanged(boolean shouldVibrate)
   {
     updateFlags();
@@ -418,6 +573,7 @@ public class Keyboard2View extends View
       }
       y += row.height * _tc.row_height;
     }
+    drawLayoutPicker(canvas);
   }
 
   @Override

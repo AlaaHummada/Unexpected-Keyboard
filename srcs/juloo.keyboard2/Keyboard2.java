@@ -93,6 +93,38 @@ public class Keyboard2 extends InputMethodService
     return LayoutModifier.modify_layout(current_layout_unmodified());
   }
 
+  /** Lists the enabled layouts for the picker shown when holding space. */
+  final Keyboard2View.LayoutPickerCallback _layout_picker =
+    new Keyboard2View.LayoutPickerCallback()
+    {
+      public String[] layout_names()
+      {
+        if (_currentSpecialLayout != null) // Numpad, emoji...
+          return null;
+        int n = _config.layouts.size();
+        String[] names = new String[n];
+        for (int i = 0; i < n; i++)
+        {
+          KeyboardData l = _config.layouts.get(i);
+          if (l == null)
+            l = _localeTextLayout;
+          names[i] = (l == null || l.name == null) ? "System" : l.name;
+        }
+        return names;
+      }
+
+      public int current_layout()
+      {
+        int i = _config.get_current_layout();
+        return (i < _config.layouts.size()) ? i : 0;
+      }
+
+      public void select_layout(int i)
+      {
+        setTextLayout(i);
+      }
+    };
+
   void setTextLayout(int l)
   {
     _config.set_current_layout(l);
@@ -175,6 +207,7 @@ public class Keyboard2 extends InputMethodService
     _keyboard_container_view = (ViewGroup)inflate_view(R.layout.keyboard);
     _keyboard_layout_view = (Keyboard2View)_keyboard_container_view.findViewById(R.id.keyboard_view);
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
+    _keyboard_layout_view.set_layout_picker(_layout_picker);
     View handle = _keyboard_container_view.findViewById(R.id.floating_handle);
     handle.setOnTouchListener(_floatingResizeTouchListener);
     View resize = _keyboard_container_view.findViewById(R.id.floating_resize);

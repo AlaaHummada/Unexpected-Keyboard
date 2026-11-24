@@ -23,6 +23,8 @@ public final class Pointers implements Handler.Callback
   public static final int FLAG_P_CLEAR_LATCHED = (1 << 6);
   /** Can't be locked, even when long pressing. */
   public static final int FLAG_P_CANT_LOCK = (1 << 7);
+  /** Space bar held: the layout picker is shown and follows the pointer. */
+  public static final int FLAG_P_PICKING = (1 << 8);
 
   private Handler _longpress_handler;
   private ArrayList<Pointer> _ptrs = new ArrayList<Pointer>();
@@ -146,6 +148,12 @@ public final class Pointers implements Handler.Callback
       ptr.sliding.onTouchUp(ptr);
       return;
     }
+    if (ptr.hasFlagsAny(FLAG_P_PICKING))
+    {
+      removePtr(ptr);
+      _handler.onPickerEnd(true);
+      return;
+    }
     stopLongPress(ptr);
     KeyValue ptr_value = ptr.value;
     if (ptr.gesture != null && ptr.gesture.is_in_progress())
@@ -185,6 +193,9 @@ public final class Pointers implements Handler.Callback
 
   public void onTouchCancel()
   {
+    for (Pointer p : _ptrs)
+      if (p.hasFlagsAny(FLAG_P_PICKING))
+        _handler.onPickerEnd(false);
     clear();
     _handler.onPointerFlagsChanged(true);
   }
@@ -268,6 +279,13 @@ public final class Pointers implements Handler.Callback
     if (ptr.hasFlagsAny(FLAG_P_SLIDING))
     {
       ptr.sliding.onTouchMove(ptr, x, y);
+      return;
+    }
+    ptr.lastX = x;
+    ptr.lastY = y;
+    if (ptr.hasFlagsAny(FLAG_P_PICKING))
+    {
+      _handler.onPickerMove(x, y);
       return;
     }
 
@@ -441,6 +459,15 @@ public final class Pointers implements Handler.Callback
     // Latched key, no key
     if (ptr.hasFlagsAny(FLAG_P_LATCHED) || ptr.value == null)
       return;
+    // Space bar held without swiping: show the layout picker.
+    if (ptr.gesture == null
+        && ptr.value.getKind() == KeyValue.Kind.Editing
+        && ptr.value.getEditing() == KeyValue.Editing.SPACE_BAR
+        && _handler.onPickerStart(ptr.lastX, ptr.lastY))
+    {
+      ptr.flags |= FLAG_P_PICKING;
+      return;
+    }
     // Key is long-pressable
     KeyValue kv = KeyModifier.modify_long_press(ptr.value);
     if (!kv.equals(ptr.value))
@@ -556,6 +583,9 @@ public final class Pointers implements Handler.Callback
     public int timeoutWhat;
     /** [null] when not in sliding mode. */
     public Sliding sliding;
+    /** Last known position. */
+    public float lastX;
+    public float lastY;
 
     public Pointer(int p, KeyboardData.Key k, KeyValue v, float x, float y, Modifiers m, int f)
     {
@@ -569,6 +599,8 @@ public final class Pointers implements Handler.Callback
       flags = f;
       timeoutWhat = -1;
       sliding = null;
+      lastX = x;
+      lastY = y;
     }
 
     public boolean hasFlagsAny(int has)
@@ -833,5 +865,12 @@ public final class Pointers implements Handler.Callback
 
     /** Key is repeating. */
     public void onPointerHold(KeyValue k, Modifiers mods, VibratorCompat.Mode vibrateStrength);
+
+    /** Space bar held: show the layout picker. Returns [false] if there's
+        nothing to pick. */
+    public boolean onPickerStart(float x, float y);
+    public void onPickerMove(float x, float y);
+    /** [commit] is [false] when the touch is cancelled. */
+    public void onPickerEnd(boolean commit);
   }
 }

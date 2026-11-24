@@ -92,6 +92,7 @@ public final class KeyValue implements Comparable<KeyValue>
     SELECT_INSIDE,
     JUMP_FORWARD,
     JUMP_BACKWARD,
+    DELETE_IN_WORD,
   }
 
   public static enum Placeholder
@@ -768,6 +769,7 @@ public final class KeyValue implements Comparable<KeyValue>
       case "undo": return editingKey(0xE036, Editing.UNDO, 0);
       case "redo": return editingKey(0xE037, Editing.REDO, 0);
       case "delete_word": return editingKey(0xE01B, Editing.DELETE_WORD, 0);
+      case "delete_in_word": return editingKey(0xE22A, Editing.DELETE_IN_WORD, 0);
       case "forward_delete_word": return editingKey(0xE01C, Editing.FORWARD_DELETE_WORD, 0);
       case "cursor_left": return sliderKey(Slider.Cursor_left, 1);
       case "cursor_right": return sliderKey(Slider.Cursor_right, 1);

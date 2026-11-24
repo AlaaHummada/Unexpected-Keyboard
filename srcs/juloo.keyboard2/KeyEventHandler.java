@@ -339,6 +339,7 @@ public final class KeyEventHandler
       case SELECTION_CANCEL: cancel_selection(); break;
       case SPACE_BAR: handle_space_bar(); break;
       case BACKSPACE: handle_backspace(); break;
+      case DELETE_IN_WORD: delete_in_word(); break;
     }
   }
 
@@ -407,6 +408,26 @@ public final class KeyEventHandler
         break;
       }
     }
+  }
+
+  /** Delete the whole word under the cursor (or the selection). */
+  void delete_in_word()
+  {
+    InputConnection conn = _recv.getCurrentInputConnection();
+    if (conn == null)
+      return;
+    CharSequence sel = conn.getSelectedText(0);
+    if (sel != null && sel.length() > 0)
+    {
+      conn.commitText("", 1);
+      return;
+    }
+    CharSequence b = conn.getTextBeforeCursor(TextTargets.MAX_CHARS, 0);
+    CharSequence a = conn.getTextAfterCursor(TextTargets.MAX_CHARS, 0);
+    int[] d = TextTargets.word_around((b == null) ? "" : b.toString(),
+        (a == null) ? "" : a.toString());
+    if (d != null)
+      conn.deleteSurroundingText(d[0], d[1]);
   }
 
   static ExtractedTextRequest _move_cursor_req = null;

@@ -132,6 +132,40 @@ public final class TextTargets
     return null;
   }
 
+  /** Characters to delete before and after the cursor to remove the word
+      it's in (letters, digits, '_' and combining marks such as harakat). If
+      the cursor is between spaces, the run of spaces is removed instead.
+      Returns [null] if there's nothing to delete. */
+  public static int[] word_around(String before, String after)
+  {
+    boolean word = (before.length() > 0 && is_word(before.charAt(before.length() - 1)))
+      || (after.length() > 0 && is_word(after.charAt(0)));
+    int l = before.length();
+    while (l > 0 && class_matches(before.charAt(l - 1), word))
+      l--;
+    int r = 0;
+    while (r < after.length() && class_matches(after.charAt(r), word))
+      r++;
+    int nb = before.length() - l;
+    if (nb + r == 0)
+      return null;
+    return new int[]{ nb, r };
+  }
+
+  static boolean class_matches(char c, boolean word)
+  {
+    return word ? is_word(c) : (c == ' ' || c == '\t');
+  }
+
+  static boolean is_word(char c)
+  {
+    if (Character.isLetterOrDigit(c) || c == '_')
+      return true;
+    int t = Character.getType(c);
+    return t == Character.NON_SPACING_MARK || t == Character.COMBINING_SPACING_MARK
+      || t == Character.ENCLOSING_MARK;
+  }
+
   static boolean same(char a, char b)
   {
     return a == b || Character.toLowerCase(a) == Character.toLowerCase(b);

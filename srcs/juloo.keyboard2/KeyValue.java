@@ -86,6 +86,12 @@ public final class KeyValue implements Comparable<KeyValue>
     SELECTION_CANCEL,
     SPACE_BAR,
     BACKSPACE,
+    // One-shot keys waiting for a target character, see [TextTargets].
+    DELETE_INSIDE,
+    DELETE_AROUND,
+    SELECT_INSIDE,
+    JUMP_FORWARD,
+    JUMP_BACKWARD,
   }
 
   public static enum Placeholder
@@ -664,7 +670,7 @@ public final class KeyValue implements Comparable<KeyValue>
       case "complete_emoji": return statefulKey(Stateful.Complete_emoji);
       case "hide_self": return eventKey("⊻", Event.HIDE_SELF, FLAG_SMALLER_FONT);
       case "change_dictionary": return eventKey(0xE01D, Event.CHANGE_DICTIONARY, 0);
-      case "toggle_floating": return eventKey("❐", Event.TOGGLE_FLOATING, FLAG_SMALLER_FONT);
+      case "toggle_floating": return eventKey(0xE229, Event.TOGGLE_FLOATING, 0);
 
       /* Key events */
       case "esc": return keyeventKey("Esc", KeyEvent.KEYCODE_ESCAPE, FLAG_SMALLER_FONT);
@@ -748,6 +754,11 @@ public final class KeyValue implements Comparable<KeyValue>
 
       /* Editing keys */
       case "backspace": return editingKey(0xE011, Editing.BACKSPACE, 0);
+      case "delete_inside": return editingKey(0xE224, Editing.DELETE_INSIDE, FLAG_SPECIAL);
+      case "delete_around": return editingKey(0xE225, Editing.DELETE_AROUND, FLAG_SPECIAL);
+      case "select_inside": return editingKey(0xE226, Editing.SELECT_INSIDE, FLAG_SPECIAL);
+      case "jump_forward": return editingKey(0xE227, Editing.JUMP_FORWARD, FLAG_SPECIAL);
+      case "jump_backward": return editingKey(0xE228, Editing.JUMP_BACKWARD, FLAG_SPECIAL);
       case "copy": return editingKey(0xE030, Editing.COPY, FLAG_SPECIAL);
       case "paste": return editingKey(0xE032, Editing.PASTE, 0);
       case "cut": return editingKey(0xE031, Editing.CUT, FLAG_SPECIAL);

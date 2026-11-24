@@ -76,6 +76,11 @@ public class ExtraKeysPreference extends PreferenceCategory
     "redo",
     "delete_word",
     "forward_delete_word",
+    "delete_inside",
+    "delete_around",
+    "select_inside",
+    "jump_forward",
+    "jump_backward",
     "superscript",
     "subscript",
     "f11_placeholder",
@@ -203,6 +208,11 @@ public class ExtraKeysPreference extends PreferenceCategory
         additional_info = format_key_combination_gesture(res, "forward_delete");
         break;
       case "selectAll": id = R.string.key_descr_selectAll; break;
+      case "delete_inside": id = R.string.key_descr_delete_inside; break;
+      case "delete_around": id = R.string.key_descr_delete_around; break;
+      case "select_inside": id = R.string.key_descr_select_inside; break;
+      case "jump_forward": id = R.string.key_descr_jump_forward; break;
+      case "jump_backward": id = R.string.key_descr_jump_backward; break;
       case "subscript": id = R.string.key_descr_subscript; break;
       case "superscript": id = R.string.key_descr_superscript; break;
       case "switch_greekmath": id = R.string.key_descr_switch_greekmath; break;

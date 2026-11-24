@@ -900,6 +900,11 @@ public class Keyboard2 extends InputMethodService
       _keyboard_layout_view.set_shift_state(state, lock);
     }
 
+    public void set_target_pending(KeyValue key)
+    {
+      _keyboard_layout_view.set_armed_key(key);
+    }
+
     public void set_compose_pending(boolean pending)
     {
       _keyboard_layout_view.set_compose_pending(pending);

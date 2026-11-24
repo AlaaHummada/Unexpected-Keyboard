@@ -34,6 +34,8 @@ public final class KeyEventHandler
   /** Remember the action that was handled. This is used by autocorrect. */
   LastAction _last_action = null;
   LastAction _next_last_action = null;
+  /** One-shot key waiting for its target character, or [null]. */
+  KeyValue _target_key = null;
 
   public KeyEventHandler(Config conf, IReceiver recv, Suggestions sg)
   {
@@ -57,6 +59,8 @@ public final class KeyEventHandler
     _move_cursor_force_fallback =
       _config.editor_config.should_move_cursor_force_fallback;
     _last_action = null;
+    if (_target_key != null)
+      set_target_key(null);
   }
 
   /** Selection has been updated. */
@@ -104,6 +108,29 @@ public final class KeyEventHandler
   {
     if (key == null)
       return;
+    if (key.getKind() == KeyValue.Kind.Editing
+        && TextTargets.is_target_action(key.getEditing()))
+    {
+      // Pressing the same key again cancels it.
+      boolean same = _target_key != null && _target_key.equals(key);
+      set_target_key(same ? null : key);
+      return;
+    }
+    if (_target_key != null && key.getKind() != KeyValue.Kind.Modifier)
+    {
+      KeyValue.Editing action = _target_key.getEditing();
+      set_target_key(null);
+      String target = null;
+      if (key.getKind() == KeyValue.Kind.Char)
+        target = String.valueOf(key.getChar());
+      else if (key.getKind() == KeyValue.Kind.String)
+        target = key.getString();
+      // Any other key (space, backspace, arrows...) only cancels.
+      if (target != null && target.length() > 0 && !target.equals(" "))
+        apply_target_action(action, target.charAt(0));
+      _last_action = LastAction.OTHER;
+      return;
+    }
     _next_last_action = LastAction.OTHER;
     Pointers.Modifiers old_mods = _mods;
     update_meta_state(mods);
@@ -312,6 +339,73 @@ public final class KeyEventHandler
       case SELECTION_CANCEL: cancel_selection(); break;
       case SPACE_BAR: handle_space_bar(); break;
       case BACKSPACE: handle_backspace(); break;
+    }
+  }
+
+  void set_target_key(KeyValue key)
+  {
+    _target_key = key;
+    _recv.set_target_pending(key);
+  }
+
+  /** Delete or select inside a pair of delimiters, or move the cursor to the
+      next or previous occurrence of a character. */
+  void apply_target_action(KeyValue.Editing action, char target)
+  {
+    InputConnection conn = _recv.getCurrentInputConnection();
+    if (conn == null)
+      return;
+    CharSequence b = conn.getTextBeforeCursor(TextTargets.MAX_CHARS, 0);
+    CharSequence a = conn.getTextAfterCursor(TextTargets.MAX_CHARS, 0);
+    CharSequence sel = conn.getSelectedText(0);
+    String before = (b == null) ? "" : b.toString();
+    String after = (a == null) ? "" : a.toString();
+    String selected = (sel == null) ? "" : sel.toString();
+    switch (action)
+    {
+      case JUMP_FORWARD:
+      case JUMP_BACKWARD:
+      {
+        Integer d = TextTargets.jump(before, after,
+            action == KeyValue.Editing.JUMP_FORWARD, target);
+        if (d != null)
+          move_cursor(d);
+        break;
+      }
+      default:
+      {
+        // Text is seen as [before][selected][after]; offsets of the pair are
+        // relative to the start of [before].
+        String text = before + selected + after;
+        int cur = before.length();
+        int[] pair = TextTargets.find_pair(text, cur, cur + selected.length(),
+            target);
+        if (pair == null)
+          return;
+        boolean around = action == KeyValue.Editing.DELETE_AROUND;
+        int start = around ? pair[0] : pair[0] + 1;
+        int end = around ? pair[1] + 1 : pair[1];
+        if (action == KeyValue.Editing.SELECT_INSIDE)
+        {
+          ExtractedText et = get_cursor_pos(conn);
+          if (et == null)
+            return;
+          int base = et.startOffset + Math.min(et.selectionStart, et.selectionEnd)
+            - before.length();
+          conn.setSelection(base + start, base + end);
+        }
+        else
+        {
+          conn.beginBatchEdit();
+          if (selected.length() > 0)
+            conn.commitText("", 1);
+          // Cursor is now between [before] and [after].
+          conn.deleteSurroundingText(Math.max(0, cur - start),
+              Math.max(0, end - (cur + selected.length())));
+          conn.endBatchEdit();
+        }
+        break;
+      }
     }
   }
 
@@ -591,6 +685,8 @@ public final class KeyEventHandler
     public void handle_event_key(KeyValue.Event ev);
     public void set_shift_state(boolean state, boolean lock);
     public void set_compose_pending(boolean pending);
+    /** Highlight the one-shot key waiting for a target, [null] to clear. */
+    public void set_target_pending(KeyValue key);
     public void selection_state_changed(boolean selection_is_ongoing);
     public InputConnection getCurrentInputConnection();
     public Handler getHandler();

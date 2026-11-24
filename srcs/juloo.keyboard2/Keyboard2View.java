@@ -136,6 +136,25 @@ public class Keyboard2View extends View
   }
 
   /** Called from [KeyEventHandler]. */
+  /** One-shot key waiting for a target, drawn as activated. */
+  private KeyValue _armed_key = null;
+
+  public void set_armed_key(KeyValue kv)
+  {
+    _armed_key = kv;
+    invalidate();
+  }
+
+  private boolean is_armed(KeyboardData.Key k)
+  {
+    if (_armed_key == null)
+      return false;
+    for (KeyValue v : k.keys)
+      if (v != null && v.equals(_armed_key))
+        return true;
+    return false;
+  }
+
   public void set_compose_pending(boolean pending)
   {
     set_fake_ptr_latched(_compose_key, KeyValue.COMPOSE, pending, false);
@@ -373,7 +392,7 @@ public class Keyboard2View extends View
       {
         x += k.shift * _keyWidth;
         float keyW = _keyWidth * k.width - _tc.horizontal_margin;
-        boolean isKeyDown = _pointers.isKeyDown(k);
+        boolean isKeyDown = _pointers.isKeyDown(k) || is_armed(k);
         Theme.Computed.Key tc_key;
         if (isKeyDown)
           tc_key = _tc.key_activated;

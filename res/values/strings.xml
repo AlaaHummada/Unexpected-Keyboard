@@ -168,6 +168,11 @@
     <string name="dictionaries_download_failed">Download failed: Please allow internet access</string>
     <string name="candidates_status_click_to_install">Click to install a dictionary for %s</string>
     <string name="dictionary_switcher_title">Change language</string>
+    <string name="key_descr_delete_inside">Delete inside brackets or quotes: tap it, then tap the bracket</string>
+    <string name="key_descr_delete_around">Delete brackets or quotes and their content</string>
+    <string name="key_descr_select_inside">Select inside brackets or quotes</string>
+    <string name="key_descr_jump_forward">Jump forward to a character: tap it, then tap the character</string>
+    <string name="key_descr_jump_backward">Jump backward to a character</string>
     <string name="floating_toggle_description">Toggle floating keyboard</string>
     <string name="pref_physical_keyboard_behavior">When a physical keyboard is connected</string>
     <string name="pref_physical_keyboard_behavior_hide">Hide everything</string>

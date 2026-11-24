@@ -362,8 +362,11 @@ public class ExtraKeysPreference extends PreferenceCategory
       case "redo": return mk_preferred_pos("y", 0, 5, true);
       case "f11_placeholder": return mk_preferred_pos("9", 0, 8, false);
       case "f12_placeholder": return mk_preferred_pos("0", 0, 9, false);
-      case "delete_word": return mk_preferred_pos("backspace", -1, -1, false);
-      case "forward_delete_word": return mk_preferred_pos("backspace", -1, -1, true);
+      // Delete word on the bottom-right of backspace: swiping toward the
+      // screen edge doesn't trigger the system back gesture, swiping inward
+      // from the edge does.
+      case "delete_word": return mk_preferred_pos("backspace", -1, -1, true);
+      case "forward_delete_word": return mk_preferred_pos("backspace", -1, -1, false);
     }
     return KeyboardData.PreferredPos.DEFAULT;
   }

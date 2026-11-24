@@ -350,6 +350,18 @@ public class ExtraKeysPreference extends PreferenceCategory
             });
   }
 
+  /** On the right corners of backspace: [d1] then [d2] (2 = top-right,
+      4 = bottom-right). */
+  static KeyboardData.PreferredPos mk_backspace_pos(int d1, int d2)
+  {
+    return new KeyboardData.PreferredPos(KeyValue.getKeyByName("backspace"),
+        new KeyboardData.KeyPos[]{
+          new KeyboardData.KeyPos(-1, -1, d1),
+          new KeyboardData.KeyPos(-1, -1, d2),
+          new KeyboardData.KeyPos(-1, -1, -1),
+        });
+  }
+
   static KeyboardData.PreferredPos key_preferred_pos(String key_name)
   {
     switch (key_name)
@@ -365,8 +377,8 @@ public class ExtraKeysPreference extends PreferenceCategory
       // Delete word on the bottom-right of backspace: swiping toward the
       // screen edge doesn't trigger the system back gesture, swiping inward
       // from the edge does.
-      case "delete_word": return mk_preferred_pos("backspace", -1, -1, true);
-      case "forward_delete_word": return mk_preferred_pos("backspace", -1, -1, false);
+      case "delete_word": return mk_backspace_pos(4, 2);
+      case "forward_delete_word": return mk_backspace_pos(2, 4);
     }
     return KeyboardData.PreferredPos.DEFAULT;
   }

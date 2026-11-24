@@ -54,6 +54,7 @@ public final class LayoutModifier
     // Add the bottom row before computing the extra keys
     if (kw.bottom_row)
       kw = kw.insert_row(bottom_row, kw.rows.size());
+    kw = move_forward_delete_up(kw);
     // Split the layout in landscape orientation
     if (globalConfig.split_layout)
       kw = LayoutLandscapeModifier.transform_to_landscape(kw);
@@ -89,6 +90,29 @@ public final class LayoutModifier
     if (added_number_row != null)
       kw = kw.insert_row(added_number_row, 0);
     return kw;
+  }
+
+  /** Put "delete" (forward delete) on the top of the backspace key, leaving
+      the right corners for "delete word" and "forward delete word". */
+  static KeyboardData move_forward_delete_up(KeyboardData kw)
+  {
+    final KeyValue bksp = KeyValue.getKeyByName("backspace");
+    final KeyValue del = KeyValue.getKeyByName("delete");
+    return kw.mapKeys(new KeyboardData.MapKey() {
+      public KeyboardData.Key apply(KeyboardData.Key k)
+      {
+        if (!bksp.equals(k.getKeyValue(0)) || del.equals(k.getKeyValue(7)))
+          return k;
+        for (int i = 1; i < 9; i++)
+          if (del.equals(k.getKeyValue(i)))
+          {
+            if (k.getKeyValue(7) != null)
+              return k;
+            return k.withKeyValue(i, null).withKeyValue(7, del);
+          }
+        return k;
+      }
+    });
   }
 
   /** Handle the numpad layout. The [main_kw] is used to adapt the numpad to

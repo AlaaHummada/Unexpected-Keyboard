@@ -312,7 +312,7 @@ public class Keyboard2View extends View
         (width / 10 - _tc.horizontal_margin) * 3/2
         ) * _config.characterSize;
     _mainLabelSize = labelBaseSize * _config.labelTextSize;
-    _subLabelSize = labelBaseSize * _config.sublabelTextSize;
+    _subLabelSize = labelBaseSize * _config.sublabelTextSize * _config.sublabel_scale;
     int height =
       (int)(_tc.row_height * _keyboard.keysHeight
           + _config.marginTop + _marginBottom);

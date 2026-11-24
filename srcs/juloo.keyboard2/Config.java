@@ -44,6 +44,8 @@ public final class Config
 
   public final float labelTextSize;
   public final float sublabelTextSize;
+  /** User scale for the swipe labels only, on top of [characterSize]. */
+  public float sublabel_scale;
 
   // From preferences
   /** [null] represent the [system] layout. */
@@ -225,6 +227,7 @@ public final class Config
     horizontal_margin =
       get_dip_pref_oriented(dm, "horizontal_margin", 3, 28);
     double_tap_lock_shift = _prefs.getBoolean("lock_double_tap", false);
+    sublabel_scale = _prefs.getFloat("sublabel_size", 1.0f);
     characterSize =
       _prefs.getFloat("character_size", 1.15f)
       * characterSizeScale;

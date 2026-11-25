@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QWERTY folded into 4 keys. Each key is the middle of a 3x3 block of the
+     US QWERTY layout: swipe toward the letter's position around the centre.
+       q w e   r t y   u i o   [ p ]
+       a S d   f G h   j K l   ; P '
+       z x c   v b n   m , .   \ / =
+     For example on K: up-left u, up i, up-right o, left j, right l,
+     down-left m. -->
+<keyboard name="QWERTY Minimal" script="latin">
+  <row>
+    <key c="1" s="!" n="`"/>
+    <key c="2" s="\@" n="~"/>
+    <key c="3" s="\#" n="-"/>
+    <key c="4" s="$" n="_"/>
+    <key c="5" s="%" n="+"/>
+    <key c="6" s="^" n="&quot;"/>
+    <key c="7" s="&amp;" n="|"/>
+    <key c="8" s="*" n="{"/>
+    <key c="9" s="(" n="}"/>
+    <key c="0" s=")" n="&lt;"/>
+  </row>
+  <row height="1.6">
+    <key width="2.5" c="s" nw="q" n="w" ne="e" w="a" e="d" sw="z" s="x" se="c"/>
+    <key width="2.5" c="g" nw="r" n="t" ne="y" w="f" e="h" sw="v" s="b" se="n"/>
+    <key width="2.5" c="k" nw="u" n="i" ne="o" w="j" e="l" sw="m" s="," se="."/>
+    <key width="2.5" c="p" nw="[" n="&gt;" ne="]" w=";" e="'" sw="\\" s="/" se="="/>
+  </row>
+  <row>
+    <key width="2.5" role="action" c="shift" n="loc capslock"/>
+    <key width="2.5" c="\?" n="loc tab" ne="loc esc"/>
+    <key width="2.5" c=":"/>
+    <key width="2.5" role="action" c="backspace" n="delete"/>
+  </row>
+</keyboard>

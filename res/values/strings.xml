@@ -64,6 +64,7 @@
     <string name="pref_number_entry_layout_number">Number pane</string>
     <string name="pref_number_entry_layout_normal">Use the main layout</string>
     <string name="pref_category_style">Style</string>
+    <string name="pref_layouts_search_hint">Search layouts</string>
     <string name="pref_category_quick">Quick settings</string>
     <string name="pref_category_sections">All settings</string>
     <string name="pref_section_layouts">⌨️  Layouts and keys</string>

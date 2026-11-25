@@ -25,6 +25,7 @@ public class LayoutsPreference extends ListGroupPreference<LayoutsPreference.Lay
       (Layout)new NamedLayout("arab_minimal"),
       (Layout)new NamedLayout("arab_extended"),
       (Layout)new NamedLayout("latn_minimal"),
+      (Layout)new NamedLayout("latn_qwerty_minimal"),
       (Layout)new NamedLayout("jpan_hiragana_minimal"));
   static final ListGroupPreference.Serializer<Layout> SERIALIZER =
     new Serializer();
@@ -149,30 +150,85 @@ public class LayoutsPreference extends ListGroupPreference<LayoutsPreference.Lay
   @Override
   ListGroupPreference.Serializer<Layout> get_serializer() { return SERIALIZER; }
 
+  /** List of layouts with a search box on top. */
   void select_dialog(final SelectionCallback callback)
   {
-    ArrayAdapter layouts = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, _layout_display_names);
-    new AlertDialog.Builder(getContext())
-      .setView(View.inflate(getContext(), R.layout.dialog_edit_text, null))
-      .setAdapter(layouts, new DialogInterface.OnClickListener(){
-        public void onClick(DialogInterface _dialog, int which)
+    final Context ctx = getContext();
+    final List<Integer> shown = new ArrayList<Integer>();
+    final List<String> shown_names = new ArrayList<String>();
+    final ArrayAdapter<String> layouts = new ArrayAdapter<String>(ctx,
+        android.R.layout.simple_list_item_1, shown_names);
+    float d = ctx.getResources().getDisplayMetrics().density;
+    android.widget.LinearLayout box = new android.widget.LinearLayout(ctx);
+    box.setOrientation(android.widget.LinearLayout.VERTICAL);
+    final android.widget.EditText search = new android.widget.EditText(ctx);
+    search.setHint(R.string.pref_layouts_search_hint);
+    search.setSingleLine(true);
+    search.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+        | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+    android.widget.LinearLayout.LayoutParams lp =
+      new android.widget.LinearLayout.LayoutParams(-1, -2);
+    lp.setMargins((int)(20 * d), (int)(12 * d), (int)(20 * d), (int)(4 * d));
+    box.addView(search, lp);
+    android.widget.ListView list = new android.widget.ListView(ctx);
+    list.setAdapter(layouts);
+    box.addView(list, new android.widget.LinearLayout.LayoutParams(-1, -1));
+    // Match every word of the query against the display name and the id.
+    final List<String> ids = get_layout_names(ctx.getResources());
+    final Runnable refresh = new Runnable() {
+      public void run()
+      {
+        String[] words = search.getText().toString().toLowerCase()
+          .trim().split("\\s+");
+        shown.clear();
+        shown_names.clear();
+        for (int i = 0; i < _layout_display_names.length; i++)
         {
-          String name = get_layout_names(getContext().getResources()).get(which);
-          switch (name)
+          String hay = (_layout_display_names[i] + " " + ids.get(i)).toLowerCase();
+          boolean ok = true;
+          for (String w : words)
+            if (w.length() > 0 && !hay.contains(w)) { ok = false; break; }
+          if (ok)
           {
-            case "system":
-              callback.select(new SystemLayout());
-              break;
-            case "custom":
-              select_custom(callback, read_initial_custom_layout());
-              break;
-            default:
-              callback.select(new NamedLayout(name));
-              break;
+            shown.add(i);
+            shown_names.add(_layout_display_names[i]);
           }
         }
-      })
-      .show();
+        layouts.notifyDataSetChanged();
+      }
+    };
+    refresh.run();
+    search.addTextChangedListener(new android.text.TextWatcher() {
+      public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+      public void onTextChanged(CharSequence s, int a, int b, int c) {}
+      public void afterTextChanged(android.text.Editable s) { refresh.run(); }
+    });
+    final AlertDialog dialog = new AlertDialog.Builder(ctx).setView(box).create();
+    list.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+      public void onItemClick(android.widget.AdapterView<?> parent, View v,
+          int pos, long id)
+      {
+        dialog.dismiss();
+        on_layout_picked(callback, ids.get(shown.get(pos)));
+      }
+    });
+    dialog.show();
+  }
+
+  void on_layout_picked(SelectionCallback callback, String name)
+  {
+    switch (name)
+    {
+      case "system":
+        callback.select(new SystemLayout());
+        break;
+      case "custom":
+        select_custom(callback, read_initial_custom_layout());
+        break;
+      default:
+        callback.select(new NamedLayout(name));
+        break;
+    }
   }
 
   /** Dialog for specifying a custom layout. [initial_text] is the layout

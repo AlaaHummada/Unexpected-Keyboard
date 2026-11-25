@@ -72,6 +72,7 @@
     <string name="pref_key_sound_title">Key sound</string>
     <string name="pref_key_sound_off">Off</string>
     <string name="pref_key_sound_system">System click</string>
+    <string name="pref_key_sound_pigeon">Pigeon</string>
     <string name="pref_key_sound_custom">Custom sounds</string>
     <string name="pref_key_sound_volume_title">Key sound volume</string>
     <string name="pref_key_sound_pick_title">Custom key sound</string>

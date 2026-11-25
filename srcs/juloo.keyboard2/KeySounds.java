@@ -26,6 +26,8 @@ public final class KeySounds
   int _key_id = 0;
   int _special_id = 0;
   long _loaded_stamp = -1;
+  /** Which set of sounds is loaded in [_pool]: "custom" or "pigeon". */
+  String _loaded_mode = null;
 
   KeySounds(Context ctx)
   {
@@ -41,12 +43,14 @@ public final class KeySounds
   /** Load the custom sounds if they changed. */
   public void refresh(Config config)
   {
-    if (!"custom".equals(config.key_sound_mode))
+    String mode = config.key_sound_mode;
+    if (!"custom".equals(mode) && !"pigeon".equals(mode))
       return;
     File k = CustomAssets.file(_ctx, CustomAssets.SOUND_KEY);
     File s = CustomAssets.file(_ctx, CustomAssets.SOUND_SPECIAL);
     long st = stamp(k) * 31 + stamp(s);
-    if (_pool != null && st == _loaded_stamp)
+    if (_pool != null && mode.equals(_loaded_mode)
+        && ("pigeon".equals(mode) || st == _loaded_stamp))
       return;
     if (_pool != null)
       _pool.release();
@@ -56,9 +60,19 @@ public final class KeySounds
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
           .build())
       .build();
-    _key_id = k.exists() ? _pool.load(k.getPath(), 1) : 0;
-    _special_id = s.exists() ? _pool.load(s.getPath(), 1) : 0;
+    if ("pigeon".equals(mode))
+    {
+      // Built-in sounds, see res/raw/SOUNDS_CREDITS.txt
+      _key_id = _pool.load(_ctx, R.raw.pigeon_key, 1);
+      _special_id = _pool.load(_ctx, R.raw.pigeon_special, 1);
+    }
+    else
+    {
+      _key_id = k.exists() ? _pool.load(k.getPath(), 1) : 0;
+      _special_id = s.exists() ? _pool.load(s.getPath(), 1) : 0;
+    }
     _loaded_stamp = st;
+    _loaded_mode = mode;
   }
 
   static final KeyValue ENTER = KeyValue.getKeyByName("enter");

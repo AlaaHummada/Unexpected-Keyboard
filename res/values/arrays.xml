@@ -104,11 +104,13 @@
   <string-array name="pref_key_sound_entries">
     <item>@string/pref_key_sound_off</item>
     <item>@string/pref_key_sound_system</item>
+    <item>@string/pref_key_sound_pigeon</item>
     <item>@string/pref_key_sound_custom</item>
   </string-array>
   <string-array name="pref_key_sound_values">
     <item>off</item>
     <item>system</item>
+    <item>pigeon</item>
     <item>custom</item>
   </string-array>
   <string-array name="pref_number_entry_values">

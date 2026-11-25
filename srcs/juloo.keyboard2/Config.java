@@ -201,7 +201,7 @@ public final class Config
     if (key_sound_mode.equals("theme"))
       key_sound_mode = "pigeon".equals(_prefs.getString("theme", "")) ? "pigeon" : "off";
     key_sound_volume = _prefs.getInt("key_sound_volume", 50);
-    background_dim = _prefs.getInt("background_dim", 25) * 255 / 100;
+    background_dim = _prefs.getInt("background_dim", 0) * 255 / 100;
     vibrate_duration = _prefs.getInt("vibrate_duration", 20);
     longPressTimeout = _prefs.getInt("longpress_timeout", 600);
     longPressInterval = _prefs.getInt("longpress_interval", 65);
@@ -218,7 +218,7 @@ public final class Config
     keyOpacity = _prefs.getInt("key_opacity", 100) * 255 / 100;
     // The pigeon theme has see-through keys to show its picture.
     if (pigeon)
-      keyOpacity = keyOpacity * 60 / 100;
+      keyOpacity = keyOpacity * 55 / 100;
     keyActivatedOpacity = _prefs.getInt("key_activated_opacity", 100) * 255 / 100;
     // keyboard border settings
     borderConfig = _prefs.getBoolean("border_config", false);

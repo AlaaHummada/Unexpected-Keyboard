@@ -299,6 +299,8 @@ public class Keyboard2 extends InputMethodService
     if (_default_background == null)
       _default_background = _keyboard_container_view.getBackground();
     android.graphics.Bitmap pic = CustomAssets.background(this);
+    if (pic == null && "pigeon".equals(_config.theme_name))
+      pic = CustomAssets.theme_background(this, R.drawable.pigeon_background);
     Drawable bg = (pic != null)
       ? new CustomAssets.CoverDrawable(pic, _config.background_dim)
       : _default_background.mutate();

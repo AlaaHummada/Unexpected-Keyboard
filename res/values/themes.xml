@@ -84,6 +84,30 @@
     <item name="emoji_button_bg" type="color">#202020</item>
     <item name="emoji_color" type="color">#ffffff</item>
   </style>
+  <!-- Pigeon: slate grey keys, cream labels, neck-green and eye-orange
+       accents. Comes with a background picture and key sounds. -->
+  <style name="Pigeon" parent="BaseTheme">
+    <item name="android:isLightTheme">false</item>
+    <item name="colorKeyboard">#24272b</item>
+    <item name="colorKey">#3a3f46</item>
+    <item name="colorKeyActivated">#1d2024</item>
+    <item name="colorKeyAction">#2e3238</item>
+    <item name="colorKeySpaceBar">#343940</item>
+    <item name="keyBorderWidth">1.2dp</item>
+    <item name="keyBorderWidthActivated">0dp</item>
+    <item name="keyBorderWidthAction">1.2dp</item>
+    <item name="keyBorderWidthSpaceBar">1.2dp</item>
+    <item name="keyBorderColorLeft">#4a4f57</item>
+    <item name="keyBorderColorTop">#5a6068</item>
+    <item name="keyBorderColorRight">#4a4f57</item>
+    <item name="keyBorderColorBottom">#6b4f7a</item>
+    <item name="colorLabel">#f4efe2</item>
+    <item name="colorLabelActivated">#5fd3a2</item>
+    <item name="colorLabelLocked">#ff7a3d</item>
+    <item name="colorSubLabel">#cfc9b8</item>
+    <item name="emoji_button_bg" type="color">#2e3238</item>
+    <item name="emoji_color" type="color">#f4efe2</item>
+  </style>
   <style name="Light" parent="BaseTheme">
     <item name="android:isLightTheme">true</item>
     <item name="colorKeyboard">#e3e3e3</item>

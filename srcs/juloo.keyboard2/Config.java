@@ -63,6 +63,8 @@ public final class Config
   public boolean vibrate_custom;
   /** "off", "system" or "custom", see [KeySounds]. */
   public String key_sound_mode;
+  /** Name of the selected theme, as in the preferences. */
+  public String theme_name;
   public int key_sound_volume; // 0 - 100
   /** Darkening of the background picture, 0 - 255. */
   public int background_dim;
@@ -195,7 +197,9 @@ public final class Config
     float slider_sensitivity = Float.valueOf(_prefs.getString("slider_sensitivity", "30")) / 100.f;
     slide_step_px = slider_sensitivity * swipe_scaling;
     vibrate_custom = _prefs.getBoolean("vibrate_custom", false);
-    key_sound_mode = _prefs.getString("key_sound", "off");
+    key_sound_mode = _prefs.getString("key_sound", "theme");
+    if (key_sound_mode.equals("theme"))
+      key_sound_mode = "pigeon".equals(_prefs.getString("theme", "")) ? "pigeon" : "off";
     key_sound_volume = _prefs.getInt("key_sound_volume", 50);
     background_dim = _prefs.getInt("background_dim", 25) * 255 / 100;
     vibrate_duration = _prefs.getInt("vibrate_duration", 20);
@@ -209,7 +213,12 @@ public final class Config
     labelBrightness = _prefs.getInt("label_brightness", 100) * 255 / 100;
     // Keyboard opacity
     keyboardOpacity = _prefs.getInt("keyboard_opacity", 100) * 255 / 100;
+    theme_name = _prefs.getString("theme", "");
+    boolean pigeon = "pigeon".equals(theme_name);
     keyOpacity = _prefs.getInt("key_opacity", 100) * 255 / 100;
+    // The pigeon theme has see-through keys to show its picture.
+    if (pigeon)
+      keyOpacity = keyOpacity * 60 / 100;
     keyActivatedOpacity = _prefs.getInt("key_activated_opacity", 100) * 255 / 100;
     // keyboard border settings
     borderConfig = _prefs.getBoolean("border_config", false);
@@ -332,6 +341,7 @@ public final class Config
       case "epaperblack": return R.style.ePaperBlack;
       case "dracula": return R.style.Dracula;
       case "gradientpurplepink": return R.style.GradientPurplePink;
+      case "pigeon": return R.style.Pigeon;
       default:
       case "system":
         if ((night_mode & Configuration.UI_MODE_NIGHT_NO) != 0)

@@ -112,6 +112,20 @@ public final class CustomAssets
     return _bg_cache;
   }
 
+  static Bitmap _theme_bg = null;
+  static int _theme_bg_id = 0;
+
+  /** Background picture that comes with a theme. Cached. */
+  public static Bitmap theme_background(Context ctx, int res_id)
+  {
+    if (_theme_bg == null || _theme_bg_id != res_id)
+    {
+      _theme_bg = BitmapFactory.decodeResource(ctx.getResources(), res_id);
+      _theme_bg_id = res_id;
+    }
+    return _theme_bg;
+  }
+
   /** Draws a picture scaled to cover its bounds ("center crop"), darkened by
       [dim] (0 - 255). */
   public static final class CoverDrawable extends Drawable

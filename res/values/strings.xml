@@ -70,6 +70,7 @@
     <string name="pref_background_remove_title">Remove background picture</string>
     <string name="pref_background_removed">Background picture removed</string>
     <string name="pref_key_sound_title">Key sound</string>
+    <string name="pref_key_sound_theme">Theme sounds (pigeon theme only)</string>
     <string name="pref_key_sound_off">Off</string>
     <string name="pref_key_sound_system">System click</string>
     <string name="pref_key_sound_pigeon">Pigeon</string>
@@ -110,6 +111,7 @@
     <string name="pref_theme_e_epaperblack">ePaper Black</string>
     <string name="pref_theme_e_dracula">Dracula</string>
     <string name="pref_theme_e_gradientpurplepink">Purple Pink Gradient</string>
+    <string name="pref_theme_e_pigeon">Pigeon 🐦</string>
     <string name="pref_swipe_dist_e_very_short">Very short</string>
     <string name="pref_swipe_dist_e_short">Short</string>
     <string name="pref_swipe_dist_e_default">Normal</string>

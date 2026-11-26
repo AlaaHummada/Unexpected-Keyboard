@@ -77,6 +77,7 @@ public class ExtraKeysPreference extends PreferenceCategory
     "delete_word",
     "forward_delete_word",
     "delete_in_word",
+    "select_in_word",
     "delete_inside",
     "delete_around",
     "select_inside",
@@ -158,6 +159,7 @@ public class ExtraKeysPreference extends PreferenceCategory
       case "forward_delete_word":
       case "alt":
       case "delete_in_word":
+      case "select_in_word":
         return true;
       default:
         return false;
@@ -212,6 +214,7 @@ public class ExtraKeysPreference extends PreferenceCategory
       case "selectAll": id = R.string.key_descr_selectAll; break;
       case "delete_inside": id = R.string.key_descr_delete_inside; break;
       case "delete_in_word": id = R.string.key_descr_delete_in_word; break;
+      case "select_in_word": id = R.string.key_descr_select_in_word; break;
       case "delete_around": id = R.string.key_descr_delete_around; break;
       case "select_inside": id = R.string.key_descr_select_inside; break;
       case "jump_forward": id = R.string.key_descr_jump_forward; break;
@@ -384,6 +387,8 @@ public class ExtraKeysPreference extends PreferenceCategory
       case "forward_delete_word": return mk_backspace_pos(2, 4);
       // Middle right: swiping toward the screen edge, no back gesture.
       case "delete_in_word": return mk_backspace_pos(6, 4);
+      // Down: not a horizontal swipe, so no back gesture.
+      case "select_in_word": return mk_backspace_pos(8, 4);
     }
     return KeyboardData.PreferredPos.DEFAULT;
   }

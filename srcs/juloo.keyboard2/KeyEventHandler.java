@@ -340,6 +340,7 @@ public final class KeyEventHandler
       case SPACE_BAR: handle_space_bar(); break;
       case BACKSPACE: handle_backspace(); break;
       case DELETE_IN_WORD: delete_in_word(); break;
+      case SELECT_IN_WORD: select_in_word(); break;
     }
   }
 
@@ -428,6 +429,27 @@ public final class KeyEventHandler
         (a == null) ? "" : a.toString());
     if (d != null)
       conn.deleteSurroundingText(d[0], d[1]);
+  }
+
+  /** Select the whole word under the cursor. If text is already selected,
+      the word around the start of the selection is used. */
+  void select_in_word()
+  {
+    InputConnection conn = _recv.getCurrentInputConnection();
+    if (conn == null)
+      return;
+    ExtractedText et = get_cursor_pos(conn);
+    if (et == null)
+      return;
+    int cur = et.startOffset + Math.min(et.selectionStart, et.selectionEnd);
+    CharSequence b = conn.getTextBeforeCursor(TextTargets.MAX_CHARS, 0);
+    CharSequence a = conn.getTextAfterCursor(TextTargets.MAX_CHARS, 0);
+    CharSequence sel = conn.getSelectedText(0);
+    String after = ((sel == null) ? "" : sel.toString())
+      + ((a == null) ? "" : a.toString());
+    int[] d = TextTargets.word_around((b == null) ? "" : b.toString(), after);
+    if (d != null)
+      conn.setSelection(cur - d[0], cur + d[1]);
   }
 
   static ExtractedTextRequest _move_cursor_req = null;

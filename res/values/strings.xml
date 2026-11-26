@@ -212,6 +212,7 @@
     <string name="dictionaries_download_failed">Download failed: Please allow internet access</string>
     <string name="candidates_status_click_to_install">Click to install a dictionary for %s</string>
     <string name="dictionary_switcher_title">Change language</string>
+    <string name="key_descr_select_in_word">Select the whole word under the cursor</string>
     <string name="key_descr_delete_in_word">Delete the whole word under the cursor</string>
     <string name="key_descr_delete_inside">Delete inside brackets or quotes: tap it, then tap the bracket</string>
     <string name="key_descr_delete_around">Delete brackets or quotes and their content</string>
